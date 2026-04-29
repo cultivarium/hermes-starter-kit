@@ -1,0 +1,164 @@
+version: "1.0.0"
+title: "Set up Notion"
+description: >
+  Interactive walkthrough that wires the official Notion remote MCP
+  server into the user's Goose config and guides them through enabling
+  it in the Goose Desktop UI. Designed for non-technical users who want
+  to give the agent access to their Notion pages without editing config
+  files by hand or pasting tokens.
+
+prompt: |
+  Help the user connect Goose to Notion. Use the developer extension's
+  file-editing tools to write into the user's `~/.config/goose/config.yaml`,
+  then walk them through enabling the extension in Goose's Extensions UI.
+
+  Stop and confirm with the user at every step. Do not skip steps.
+  If anything goes wrong, surface it clearly — do not paper over.
+
+  ---
+
+  ## Step 1 — Tell the user what's about to happen
+
+  In one short paragraph, tell them:
+
+  - You'll add a small block to their Goose config file at
+    `~/.config/goose/config.yaml` (Mac/Linux) or
+    `%APPDATA%\Block\goose\config\config.yaml` (Windows). The block
+    points Goose at the official Notion MCP server hosted at
+    `https://mcp.notion.com/mcp`.
+  - **No token, password, or API key** is needed — Notion handles auth
+    via a browser-based OAuth flow on first use.
+  - They can revoke access any time at
+    <https://www.notion.so/profile/integrations>.
+
+  Ask: "Ready to proceed?"
+
+  ## Step 2 — Locate config.yaml
+
+  Find the user's config file. Try the platform paths in order:
+
+    1. `$HOME/.config/goose/config.yaml` (Linux, macOS)
+    2. `$APPDATA/Block/goose/config/config.yaml` (Windows)
+
+  If neither exists, tell the user to launch Goose at least once first
+  (it'll create config.yaml on first run with the provider chosen),
+  then re-run this recipe. Stop here.
+
+  ## Step 3 — Check whether notion is already configured
+
+  Read config.yaml. If a top-level `extensions.notion` block already
+  exists, show it to the user and ask whether to:
+
+    a. Leave it as-is (skip to Step 5),
+    b. Replace it with the recommended config (Step 4),
+    c. Cancel.
+
+  ## Step 4 — Append the notion stanza
+
+  Write the following block under `extensions:` in config.yaml. Preserve
+  every other key, comment, and ordering in the file. If `extensions:`
+  doesn't exist as a top-level key, create it.
+
+      notion:
+        enabled: false
+        type: streamable_http
+        name: notion
+        description: "Notion pages and databases via the official remote MCP server (OAuth on first use)."
+        uri: "https://mcp.notion.com/mcp"
+        headers: {}
+        env_keys: []
+        envs: {}
+        timeout: 300
+        bundled: false
+        available_tools: []
+
+  Note that we deliberately write `enabled: false` — the user will
+  flip it on themselves in the next step. Writing it disabled means
+  the extension shows up in Goose Desktop's Extensions panel without
+  immediately attempting to connect, which gives the user a chance to
+  review and consent before Goose starts up the OAuth flow.
+
+  After writing, read the file back and confirm to the user that the
+  block landed correctly, with the YAML showing.
+
+  ## Step 5 — Walk through enabling in Goose Desktop
+
+  Tell the user, in this order:
+
+    1. Quit Goose Desktop completely if it's open (it caches config
+       on launch).
+    2. Reopen Goose Desktop.
+    3. Open the **Extensions** panel (Settings → Extensions, or the
+       "Extensions" sidebar item — exact path depends on Goose version).
+    4. Find the entry called **notion** in the list. It should be
+       there because Goose loads it from config.yaml at startup, and
+       it'll be shown as disabled — that's the deliberate default we
+       just wrote.
+    5. **Toggle notion on.** This is the explicit user-consent step
+       for giving Goose access to your Notion workspace.
+
+  ## Step 6 — Trigger the OAuth flow
+
+  Tell the user to start a new Goose chat and ask something Notion-y,
+  for example:
+
+    "List the most recently edited pages in my Notion workspace."
+
+  When they ask, Goose will call a notion tool, the Notion MCP server
+  will require auth, and Goose will open a browser tab on
+  notion.so/install-integration (or similar). The user signs in, picks
+  which pages/databases to share with the integration, and approves.
+  Goose stashes the refresh token in the OS keyring transparently.
+
+  **Two known Goose Desktop quirks to warn the user about up front so
+  they aren't blindsided** (these are not failures; do not start
+  troubleshooting if they happen):
+
+    1. **Multiple browser tabs may open** — typically two or three
+       copies of the same Notion authorization page. This is Goose
+       firing the OAuth URL launcher more than once during MCP
+       client initialization. Granting consent on **any one** tab is
+       fine; the user can close the others.
+
+    2. **The chat that triggered the OAuth will likely hang on
+       "loading provider"** after the user grants consent. The
+       original request-context doesn't get notified that the auth
+       succeeded. The fix is simply to **start a new chat** — the
+       refresh token is already in the keyring, and the next chat
+       picks it up cleanly. Tell the user this in advance so they
+       don't sit waiting on a stuck spinner.
+
+  ## Step 7 — Confirm success
+
+  Once the user reports back from a fresh chat (the first one will
+  likely be hung as warned in Step 6), ask them to try one Notion
+  query to confirm the connection is sticky — subsequent calls
+  reuse the refresh token without re-prompting and without opening
+  any new tabs. If that works cleanly, you're done — celebrate
+  concisely.
+
+  If anything fails (no notion entry in Extensions, OAuth doesn't
+  open, tool call errors), do NOT pretend it worked. Walk through the
+  troubleshooting in `docs/TROUBLESHOOTING.md` and surface the
+  specific error.
+
+  ---
+
+  Important constraints:
+
+  - Never write a token or secret into config.yaml. The OAuth flow is
+    the only auth mechanism for this connector — there is no token to
+    paste.
+  - Do not edit any keys other than `extensions.notion`. Preserve the
+    user's other extensions and any provider/model settings exactly.
+  - If the user asks "what about gdrive / slack / github", say those
+    are tracked separately — gdrive uses the same pattern (we'll add a
+    `set-up-gdrive` recipe once we've validated it end-to-end), slack
+    requires a workspace admin to install the Slack MCP app first, and
+    github isn't bundled because Goose isn't on GitHub's IDE allowlist
+    for OAuth dynamic-client-registration.
+
+activities:
+  - "Add notion to ~/.config/goose/config.yaml"
+  - "Walk through enabling in Desktop's Extensions UI"
+  - "Trigger the OAuth flow with a test query"

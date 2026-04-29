@@ -1,0 +1,51 @@
+version: "1.0.0"
+title: "Summarize recent PubMed papers"
+description: >
+  Given a topic, fetch recent PubMed abstracts via the ncbi-datasets
+  skill (and/or web fetch), summarize the most relevant ones, and
+  highlight common findings, disagreements, and open questions.
+  Demonstrates how to chain a skill plus public-data lookup into a
+  small literature-scan workflow.
+
+prompt: |
+  Search PubMed for recent papers on "{{ topic }}" published in the
+  last {{ window }}.
+
+  Workflow:
+    1. Use the ncbi-datasets skill (or the developer extension's web
+       fetch) to query PubMed for the topic, restricted to the date
+       window.
+    2. Pull up to {{ max_papers }} of the most relevant abstracts.
+    3. For each paper: cite it as "Author et al., Year — title" and
+       give a 2-3 sentence summary focused on findings, not methods.
+    4. After the per-paper summaries, write a short synthesis section
+       (under 200 words) covering: shared findings across papers,
+       points of disagreement, and open questions a follow-up study
+       could address.
+    5. End with a single bullet of "what to read next" — the one
+       paper from the set most worth a deep read, with a one-sentence
+       reason.
+
+  Don't invent citations. If you can't fetch a paper, say so and
+  exclude it from the summary.
+
+parameters:
+  - key: topic
+    input_type: string
+    requirement: required
+    description: "The PubMed search topic, e.g. 'CRISPR base editing'"
+  - key: window
+    input_type: string
+    requirement: optional
+    default: "12 months"
+    description: "How far back to search (e.g. '6 months', '2 years')"
+  - key: max_papers
+    input_type: number
+    requirement: optional
+    default: "10"
+    description: "Maximum number of papers to summarize"
+
+activities:
+  - "Search PubMed for the topic"
+  - "Summarize each abstract"
+  - "Write a cross-paper synthesis"

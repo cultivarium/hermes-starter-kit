@@ -1,0 +1,51 @@
+version: "1.0.0"
+title: "Weekly literature scan"
+description: >
+  A repeating literature-scan recipe. Searches public databases (PubMed,
+  bioRxiv) for new work on a saved set of topics, compares against last
+  week's scan via the memory extension, and highlights only what is
+  genuinely new. Designed to be re-run on a schedule.
+
+prompt: |
+  Run a weekly literature scan on the topics: {{ topics }}.
+
+  Workflow:
+    1. First, recall what you previously saved under the memory key
+       "weekly-lit-scan/last-run" (if anything). This is the baseline
+       — papers you have already shown the user.
+
+    2. For each topic, search PubMed and bioRxiv for new papers from
+       the last {{ window }}. Use the ncbi-datasets skill for PubMed
+       and the developer extension's web fetch for bioRxiv.
+
+    3. Build a list of papers that are *new since the last run* —
+       i.e., not already in the memory baseline. If this is the first
+       run, treat everything found as new.
+
+    4. For each new paper, write one bullet:
+         "Author et al., Year — title. (one-line takeaway)"
+
+    5. If there are zero new papers, say so plainly. Don't pad.
+
+    6. Update memory: save the union of (last run's papers) and (new
+       papers) under "weekly-lit-scan/last-run", along with the date
+       of this run, so the next scan has a fresh baseline.
+
+    7. End with a short "this week's standout" — the single paper most
+       worth the user's attention, with one sentence on why.
+
+parameters:
+  - key: topics
+    input_type: string
+    requirement: required
+    description: "Comma-separated list of topics to scan, e.g. 'CRISPR base editing, prime editing'"
+  - key: window
+    input_type: string
+    requirement: optional
+    default: "7 days"
+    description: "Look-back window for 'new' (e.g. '7 days', '14 days')"
+
+activities:
+  - "Recall last week's scan from memory"
+  - "Search PubMed and bioRxiv"
+  - "Write a diff against the baseline"

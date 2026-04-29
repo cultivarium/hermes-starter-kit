@@ -1,0 +1,145 @@
+name: acceptance
+
+on:
+  push:
+    branches: [main, stable]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  install:
+    name: install (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14            # arm64
+            shell: bash
+            installer: scripts/install.sh
+            verify:    scripts/lib/verify.sh
+          - os: ubuntu-22.04
+            shell: bash
+            installer: scripts/install.sh
+            verify:    scripts/lib/verify.sh
+          - os: windows-2022
+            shell: pwsh
+            installer: scripts\install.ps1
+            verify:    scripts\lib\verify.ps1
+
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python deps used by helpers
+        run: python -m pip install --user pyyaml
+
+      - name: Set up Node.js (for npx-based connectors)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # The installer expects a `goose` binary. We don't run a real Goose
+      # session in CI, so a stub that answers `--version` is enough to
+      # exercise everything except the optional E2E check (which we leave
+      # gated on RUN_E2E=1 and don't enable here).
+      - name: Stub goose (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          cat > "$HOME/.local/bin/goose" <<'STUB'
+          #!/usr/bin/env bash
+          case "${1:-}" in
+            --version) echo "goose 1.4.2" ;;
+            recipe)
+              [[ "${2:-}" == "validate" && -f "${3:-}" ]] && exit 0
+              exit 0 ;;
+            *) exit 0 ;;
+          esac
+          STUB
+          chmod +x "$HOME/.local/bin/goose"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Stub goose (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $stubDir = Join-Path $env:USERPROFILE "stub-bin"
+          New-Item -ItemType Directory -Force -Path $stubDir | Out-Null
+          $stub = @'
+          @echo off
+          if "%1"=="--version" (echo goose 1.4.2 & exit /b 0)
+          exit /b 0
+          '@
+          Set-Content -Path (Join-Path $stubDir "goose.cmd") -Value $stub
+          Add-Content -Path $env:GITHUB_PATH -Value $stubDir
+
+      # ---- fresh install ----
+      - name: Run installer (fresh)
+        if: runner.os != 'Windows'
+        run: |
+          bash ${{ matrix.installer }} \
+            --kit-source "$PWD" \
+            --prefix "$RUNNER_TEMP/goose-cfg" \
+            --provider anthropic \
+            --connectors notion \
+            --non-interactive
+
+      - name: Run installer (fresh, Windows)
+        if: runner.os == 'Windows'
+        run: |
+          & ${{ matrix.installer }} `
+            -KitSource "$PWD" `
+            -Prefix "$env:RUNNER_TEMP\goose-cfg" `
+            -Provider anthropic `
+            -Connectors notion `
+            -NonInteractive
+
+      # ---- verify the fresh install ----
+      - name: Verify (Unix)
+        if: runner.os != 'Windows'
+        env:
+          GOOSE_CONFIG_DIR: ${{ runner.temp }}/goose-cfg
+          STARTER_DIR: ${{ github.workspace }}
+        run: bash ${{ matrix.verify }}
+
+      - name: Verify (Windows)
+        if: runner.os == 'Windows'
+        env:
+          GOOSE_CONFIG_DIR: ${{ runner.temp }}\goose-cfg
+          STARTER_DIR: ${{ github.workspace }}
+        run: pwsh ${{ matrix.verify }}
+
+      # ---- idempotent re-run: must not clobber state ----
+      - name: Re-run installer (update mode)
+        if: runner.os != 'Windows'
+        run: |
+          bash ${{ matrix.installer }} \
+            --kit-source "$PWD" \
+            --prefix "$RUNNER_TEMP/goose-cfg" \
+            --update --non-interactive
+          # User-edit preservation check: tweak a skill file, re-run, confirm
+          # the edit survives.
+          echo "USER EDIT" >> "$RUNNER_TEMP/goose-cfg/skills/ncbi-datasets/SKILL.md"
+          bash ${{ matrix.installer }} \
+            --kit-source "$PWD" \
+            --prefix "$RUNNER_TEMP/goose-cfg" \
+            --update --non-interactive
+          tail -1 "$RUNNER_TEMP/goose-cfg/skills/ncbi-datasets/SKILL.md" | grep -q "USER EDIT" \
+            || { echo "user edit was clobbered"; exit 1; }
+
+      - name: Re-run installer (update mode, Windows)
+        if: runner.os == 'Windows'
+        run: |
+          & ${{ matrix.installer }} -KitSource "$PWD" -Prefix "$env:RUNNER_TEMP\goose-cfg" -Update -NonInteractive
+          Add-Content -Path "$env:RUNNER_TEMP\goose-cfg\skills\ncbi-datasets\SKILL.md" -Value "USER EDIT"
+          & ${{ matrix.installer }} -KitSource "$PWD" -Prefix "$env:RUNNER_TEMP\goose-cfg" -Update -NonInteractive
+          $last = (Get-Content "$env:RUNNER_TEMP\goose-cfg\skills\ncbi-datasets\SKILL.md" -Tail 1)
+          if ($last -ne "USER EDIT") { Write-Error "user edit was clobbered"; exit 1 }

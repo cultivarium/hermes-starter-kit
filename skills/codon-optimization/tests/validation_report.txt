@@ -1,0 +1,98 @@
+==============================================================================
+CODONOPT VALIDATION REPORT: Tool Output vs Published Sequences
+==============================================================================
+
+## GFP Optimization Across 4 Target Organisms
+------------------------------------------------------------------------------
+
+  Target: E. coli
+    Our CAI:       0.5896 -> 1.0000
+    Codons changed: 145/239
+    Protein OK:    True
+
+  Target: S. cerevisiae
+    Our CAI:       0.7632 -> 1.0000
+    Codons changed: 115/239
+    Protein OK:    True
+    Published CAI: 0.8990 (yEGFP3 (yeast codon-optimized GFP))
+    Our CAI >= published: True
+    Codon identity (ours vs published): 69.9%
+    Nucleotide identity (ours vs published): 89.5%
+
+  Target: B. subtilis
+    Our CAI:       0.7718 -> 1.0000
+    Codons changed: 122/239
+    Protein OK:    True
+    Published CAI: 0.8127 (GFPopt (codon-optimized for low-GC gram-positive bacteria))
+    Our CAI >= published: True
+    Codon identity (ours vs published): 50.6%
+    Nucleotide identity (ours vs published): 79.8%
+
+  Target: H. sapiens
+    Our CAI:       0.7102 -> 1.0000
+    Codons changed: 168/239
+    Protein OK:    True
+    Published CAI: 0.9604 (EGFP (Enhanced GFP, human codon-optimized + mutations))
+    Our CAI >= published: True
+
+
+## SpCas9 Optimization (S. pyogenes -> Human)
+------------------------------------------------------------------------------
+  Our CAI:       0.6553 -> 1.0000
+  Published CAI: 0.9895
+  Codons changed: 1098/1369
+  Protein OK:    True
+  Codon identity (ours vs published): 94.1%
+  Nucleotide identity (ours vs published): 96.2%
+
+
+## SpCas9 Optimization (S. pyogenes -> E. coli)
+------------------------------------------------------------------------------
+  CAI: 0.6010 -> 1.0000
+  Codons changed: 788/1369
+  Protein OK: True
+
+
+## SpCas9 Harmonization (B. subtilis proxy -> E. coli)
+------------------------------------------------------------------------------
+  CAI: 0.6010 -> 0.7765
+  Codons changed: 499/1369
+  Protein OK: True
+
+
+## MSP1-42 Harmonization (P. falciparum -> E. coli)
+------------------------------------------------------------------------------
+  Native CAI (E. coli):     0.6228
+  Harmonized CAI (E. coli): 0.7785
+  Nucleotide identity:       70.9% (paper reports 70.9%)
+  Proteins identical:        True
+
+
+## Insulin Optimization (Human -> E. coli)
+------------------------------------------------------------------------------
+  Our CAI:       0.6611 -> 1.0000
+  Published E. coli insulin CAI: 0.7882
+  Codons changed: 56/111
+  Protein OK:    True
+
+
+## Insulin Reverse Translation
+------------------------------------------------------------------------------
+  -> E. coli: CAI=1.0000, len=333 bp, protein OK=True
+  -> S. cerevisiae: CAI=1.0000, len=333 bp, protein OK=True
+  -> B. subtilis: CAI=1.0000, len=333 bp, protein OK=True
+
+
+## Alginate Lyase Re-optimization (already E. coli optimized)
+------------------------------------------------------------------------------
+  CAI: 0.8819 -> 1.0000
+  Codons changed: 89/258 (34%)
+  Protein OK: True
+
+  Re-targeted to S. cerevisiae:
+    CAI (yeast): 0.6437 -> 1.0000
+    Codons changed: 156/258
+
+==============================================================================
+END OF REPORT
+==============================================================================

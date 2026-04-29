@@ -1,0 +1,60 @@
+# Manifest for the Hermes Starter Kit. The installer reads this to:
+#   - know which skills/recipes to vendor and where
+#   - track per-file sha256 for idempotent updates
+#   - advertise "try these first" recipes in the post-install summary
+#
+# The installer installs skills + recipes only. Goose's own first-run
+# flow handles provider setup, and the `set-up-notion` recipe walks
+# users through adding a connector when they want one.
+
+schema_version: 1
+kit_version: 0.1.0
+min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
+released: "2026-04-29"
+
+# Skills are vendored under skills/<name>/ in this repo. The installer copies
+# each into ~/.config/goose/skills/<name>/ unless the user has modified the
+# on-disk copy (detected via sha256 comparison against .starter-kit-state.json).
+skills:
+  - name: ncbi-datasets
+    path: skills/ncbi-datasets
+    sha256: TBD-AT-RELEASE
+  - name: codon-optimization
+    path: skills/codon-optimization
+    sha256: TBD-AT-RELEASE
+  - name: protrek-search
+    path: skills/protrek-search
+    sha256: TBD-AT-RELEASE
+  - name: pysam
+    path: skills/pysam
+    sha256: TBD-AT-RELEASE
+  - name: gget
+    path: skills/gget
+    sha256: TBD-AT-RELEASE
+  - name: database-lookup
+    path: skills/database-lookup
+    sha256: TBD-AT-RELEASE
+
+recipes:
+  - name: onboarding
+    path: recipes/onboarding.yaml
+    sha256: TBD-AT-RELEASE
+  - name: summarize-pubmed
+    path: recipes/summarize-pubmed.yaml
+    sha256: TBD-AT-RELEASE
+  - name: weekly-lit-scan
+    path: recipes/weekly-lit-scan.yaml
+    sha256: TBD-AT-RELEASE
+  - name: create-a-skill
+    path: recipes/create-a-skill.yaml
+    sha256: TBD-AT-RELEASE
+  - name: add-an-mcp-server
+    path: recipes/add-an-mcp-server.yaml
+    sha256: TBD-AT-RELEASE
+  - name: set-up-notion
+    path: recipes/set-up-notion.yaml
+    sha256: TBD-AT-RELEASE
+
+# Names shown in the "what to try first" line of the post-install summary.
+starter_recipes_to_advertise:
+  - set-up-notion

@@ -1,0 +1,60 @@
+version: "1.0.0"
+title: "Hermes Starter Kit — Onboarding"
+description: >
+  A first-run tour of what this Hermes Starter Kit gives you. Greets the
+  user, walks them through the bundled skills (ncbi-datasets,
+  codon-optimization, protrek-search, pysam, gget, database-lookup),
+  surfaces the guided setup recipes available from the Extensions and
+  Recipes panels, and points them at memory if they want persistence
+  across sessions.
+
+prompt: |
+  Give a research scientist who has just installed the Goose Starter
+  Kit a short tour that proves their setup works and points them at
+  the next useful thing. Keep the whole tour under 400 words. Don't
+  pretend skills are present if they aren't.
+
+  Do these steps in order, narrating briefly as you go:
+
+  1. **Greet the user.** Don't try to detect the model or provider —
+     you can't reliably read that from inside the recipe. A short
+     hello is enough; if they explicitly ask what model they're
+     running, suggest they check Goose Desktop's Settings → Provider
+     panel.
+
+  2. **Tour the bundled skills.** Check which of these are present in
+     `~/.config/goose/skills/`: ncbi-datasets, codon-optimization,
+     protrek-search, pysam, gget, database-lookup. For each one
+     that's present, give a one-line description and one example
+     prompt the user could try later.
+
+  3. **Suggest enabling memory.** The kit ships memory disabled by
+     default (Goose's per-version default applies). If the user
+     wants the agent to remember context across sessions — useful
+     for recurring research workflows — tell them to open Goose
+     Desktop's **Extensions** panel and toggle on the **Memory**
+     extension. Don't try to enable it for them; the toggle is the
+     consent step.
+
+  4. **Point them at the guided setup recipes** for extending the
+     install. These are visible in Goose Desktop's Recipes panel:
+
+       - **set-up-notion** — wire up Notion as a data source via
+         OAuth (no token needed; the recipe walks them through it).
+       - **create-a-skill** — co-author a new skill from scratch.
+       - **add-an-mcp-server** — connect any MCP-speaking data
+         source they care about beyond what the kit ships.
+
+     Mention these by name and explain that they can be launched
+     from the Recipes panel in Desktop.
+
+  5. **End with three concrete things to try next** drawn from the
+     skills that are actually present in step 2 — not generic
+     suggestions. Frame each as a sentence the user could just type
+     into a chat, e.g. "Look up the genome for *E. coli* K-12
+     MG1655" if `ncbi-datasets` is installed.
+
+activities:
+  - "Greet the user"
+  - "Tour the bundled skills"
+  - "Point at memory + setup recipes"
