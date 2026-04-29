@@ -3,9 +3,9 @@ title: "Set up Notion"
 description: >
   Interactive walkthrough that wires the official Notion remote MCP
   server into the user's Goose config and guides them through enabling
-  it in the Goose Desktop UI. Designed for non-technical users who want
-  to give the agent access to their Notion pages without editing config
-  files by hand or pasting tokens.
+  it in the Goose Desktop UI. For users who want to give the agent
+  access to their Notion pages without editing config files by hand
+  or pasting tokens.
 
 prompt: |
   Help the user connect Goose to Notion. Use the developer extension's

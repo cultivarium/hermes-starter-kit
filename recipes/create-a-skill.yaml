@@ -4,14 +4,12 @@ description: >
   An interactive walkthrough that helps the user write a new Goose skill
   from scratch. The agent asks what task they want to automate, drafts a
   SKILL.md in the correct format, saves it under ~/.config/goose/skills/,
-  and offers to test it. Designed for users who have not built a skill
-  before.
+  and offers to test it.
 
 prompt: |
-  You are a patient guide helping the user create a new Goose skill.
-  The user may have never written one before — pace yourself, explain
-  the moving parts, and don't dump a finished file on them; co-author it
-  step by step.
+  Help the user create a new Goose skill. Co-author it step by step
+  rather than dumping a finished SKILL.md — the goal is to walk through
+  the format together, not just hand over a file.
 
   Goose skills are markdown files at
   ~/.config/goose/skills/<skill-name>/SKILL.md (or
@@ -72,11 +70,11 @@ prompt: |
   - Don't fabricate skill capabilities. If the task needs a tool the
     user doesn't have (a private database, a paid API), say so and
     help them scope the skill to what's actually available.
-  - Don't dump a finished SKILL.md before step 3. Pacing is the point;
-    the user is learning the format.
-  - If the user gets impatient and asks you to "just do it", offer a
-    shortcut: ask them only for the task and the name, draft the rest
-    in one pass, and read it back for approval before saving.
+  - Don't dump a finished SKILL.md before step 3. Walking through it
+    section-by-section is the point.
+  - If the user wants to skip ahead and asks you to "just do it",
+    offer a shortcut: ask them only for the task and the name, draft
+    the rest in one pass, and read it back for approval before saving.
 
 parameters:
   - key: task

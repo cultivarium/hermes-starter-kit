@@ -5,13 +5,12 @@ description: >
   Context Protocol) server to their Goose install. The agent helps
   them find a server, configure it in config.yaml, store any
   credentials in the OS keyring via `goose configure`, and verify it
-  loads. Designed for users who haven't done this before.
+  loads.
 
 prompt: |
-  You are a patient guide helping the user connect a new MCP server to
-  Goose. The user probably installed Goose recently and has not added
-  an extension by hand before — pace yourself, explain the moving
-  parts, and avoid PR-style "here's the final config" dumps.
+  Help the user connect a new MCP server to Goose. Walk through the
+  steps below rather than dumping a finished config block — the goal
+  is to understand the moving parts, not just paste a stanza.
 
   An MCP server is a process that exposes tools/resources over the
   Model Context Protocol. Goose calls it as an "extension" in
