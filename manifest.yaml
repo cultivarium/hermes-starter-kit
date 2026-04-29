@@ -8,7 +8,7 @@
 # users through adding a connector when they want one.
 
 schema_version: 1
-kit_version: 0.1.0
+kit_version: 0.1.1
 min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
 released: "2026-04-29"
 

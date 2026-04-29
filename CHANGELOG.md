@@ -4,6 +4,26 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] — 2026-04-29
+
+### Added
+
+- **`update-kit` recipe** — discoverable in-Goose update path for
+  non-technical users. Wraps the existing `update.sh` /
+  `install.ps1` idempotent fetch-and-refresh in a Recipes-panel
+  UX, summarizes which kit-owned files were refreshed vs. left
+  alone (sha256-protected user edits), and prompts a Desktop
+  restart so cached recipes and skills reload.
+
+### Changed
+
+- Recipe prompts no longer frame the user as needing patience.
+  Removed "patient guide" / "may have never written one before" /
+  "if the user gets impatient" framing from `create-a-skill` and
+  `add-an-mcp-server`. Removed "non-technical users" labeling from
+  `set-up-notion`'s description. Recipe prompts are shown to users
+  during execution, so the tone matters.
+
 ## [0.1.0] — 2026-04-29
 
 First public release.
