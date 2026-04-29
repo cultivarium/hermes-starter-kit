@@ -109,7 +109,12 @@ if [[ -n "$KIT_SOURCE" ]]; then
 elif [[ -d "$STARTER_DIR/.git" ]]; then
   log "Updating starter kit at $STARTER_DIR"
   git -C "$STARTER_DIR" fetch --quiet --depth 1 origin "$KIT_REF"
-  git -C "$STARTER_DIR" checkout --quiet "$KIT_REF"
+  # Detach to FETCH_HEAD rather than `git checkout "$KIT_REF"`. The latter
+  # checks out the *local* branch named $KIT_REF, which fetch does not
+  # fast-forward — leaving the working tree at the old commit even after
+  # a successful fetch. The .starter-kit/ dir is an install-managed
+  # asset, so detached HEAD is fine and works for both branches and tags.
+  git -C "$STARTER_DIR" checkout --quiet --detach FETCH_HEAD
 else
   log "Cloning starter kit ($KIT_REF) into $STARTER_DIR"
   git clone --quiet --depth 1 --branch "$KIT_REF" "$KIT_REPO" "$STARTER_DIR"

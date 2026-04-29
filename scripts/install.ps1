@@ -110,7 +110,12 @@ if ($KitSource) {
 } elseif (Test-Path (Join-Path $StarterDir ".git")) {
     Log "Updating starter kit at $StarterDir"
     git -C $StarterDir fetch --quiet --depth 1 origin $Ref
-    git -C $StarterDir checkout --quiet $Ref
+    # Detach to FETCH_HEAD rather than `git checkout $Ref`. The latter
+    # checks out the *local* branch named $Ref, which fetch does not
+    # fast-forward — leaving the working tree at the old commit even
+    # after a successful fetch. The .starter-kit/ dir is install-managed,
+    # so detached HEAD is fine and works for both branches and tags.
+    git -C $StarterDir checkout --quiet --detach FETCH_HEAD
 } else {
     Log "Cloning starter kit ($Ref) into $StarterDir"
     git clone --quiet --depth 1 --branch $Ref $KitRepo $StarterDir

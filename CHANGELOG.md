@@ -4,6 +4,22 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] — 2026-04-29
+
+### Fixed
+
+- **Updates from existing installs now actually move the working
+  tree.** `install.sh` / `install.ps1` previously did
+  `git fetch --depth 1 origin $REF` followed by
+  `git checkout $REF` — but fetch does not fast-forward the local
+  branch named `$REF`, so the checkout silently stayed on the old
+  commit. The script logged "Updating starter kit" and reported
+  success while leaving every recipe and skill at the originally-
+  installed version. Now we `git checkout --detach FETCH_HEAD`,
+  which always lands on the freshly-fetched ref. Affects anyone
+  running `update.sh` or re-running the installer; clean installs
+  (the `git clone` path) were not affected.
+
 ## [0.1.1] — 2026-04-29
 
 ### Added
