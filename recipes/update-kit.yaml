@@ -1,0 +1,141 @@
+version: "1.0.0"
+title: "Update the Hermes Starter Kit"
+description: >
+  Pulls the latest skills and recipes from the public starter kit
+  repository and refreshes the local copy. Runs the kit's own
+  update script under the hood. Files the user has edited locally
+  are preserved; only pristine kit-owned files are overwritten.
+
+prompt: |
+  Help the user update their Hermes Starter Kit installation. Run the
+  kit's update script via the developer extension's shell tool, then
+  summarize what changed. The script is idempotent and safe to run
+  whenever — but new content only appears here after we've cut a new
+  release upstream, so an update may be a no-op.
+
+  Stop and confirm with the user before running any command.
+
+  ---
+
+  ## Step 1 — Tell the user what's about to happen
+
+  In one short paragraph, tell them:
+
+  - You'll run the kit's update script, which does a `git fetch` of
+    `https://github.com/cultivarium/hermes-starter-kit` and refreshes
+    any kit-owned skills and recipes in their Goose config directory.
+  - **Files they have edited locally are not overwritten.** The
+    installer fingerprints every file it writes (sha256) and only
+    refreshes files whose hash still matches what the installer
+    originally wrote — anything they've edited is left alone.
+  - **No tokens, secrets, or `config.yaml` extension stanzas are
+    touched.** Provider settings and connector configs they've added
+    via `set-up-notion` or `add-an-mcp-server` are out of scope for
+    the updater.
+  - The update may be a no-op if there's nothing new on the upstream
+    `stable` branch. That's fine — re-running it costs nothing.
+
+  Ask: "Ready to proceed?"
+
+  ## Step 2 — Locate the kit
+
+  Find the local kit checkout. Try the platform paths in order:
+
+    1. `$HOME/.config/goose/.starter-kit/` (Linux, macOS)
+    2. `$APPDATA/Block/goose/config/.starter-kit/` (Windows)
+
+  If neither exists, the kit isn't installed via the usual installer
+  path — tell the user to run the install command from
+  <https://github.com/cultivarium/hermes-starter-kit#60-second-install>
+  first, then re-run this recipe. Stop here.
+
+  ## Step 3 — Snapshot the current state
+
+  Before running the update, capture a "before" snapshot so you can
+  describe what changed afterwards. Use the developer extension's
+  shell tool:
+
+    - The current pinned git rev of the kit:
+      `git -C <kit-dir> rev-parse --short HEAD`
+    - The list of files the installer currently manages, from
+      `<goose-config-dir>/.starter-kit-state.json` (read it as JSON;
+      its keys are the relative paths under `~/.config/goose/`).
+
+  Show the user the current rev and how many skills/recipes are
+  currently tracked.
+
+  ## Step 4 — Run the update
+
+  Pick the right script for the platform and run it via the developer
+  extension's shell tool:
+
+    - macOS / Linux: `bash $HOME/.config/goose/.starter-kit/scripts/update.sh`
+    - Windows: `powershell -NoProfile -ExecutionPolicy Bypass -File "$env:APPDATA\Block\goose\config\.starter-kit\scripts\install.ps1"`
+
+  (Windows has no separate `update.ps1` — re-running `install.ps1`
+  does the same idempotent fetch-and-refresh.)
+
+  Stream the script's output back to the user verbatim, especially
+  any `WARN:` or error lines. Do not silently swallow failures.
+
+  ## Step 5 — Diff and summarize
+
+  After the script finishes, capture an "after" snapshot:
+
+    - New pinned git rev: `git -C <kit-dir> rev-parse --short HEAD`
+    - If the rev changed, show `git -C <kit-dir> log --oneline <before>..<after>`
+      so the user sees the upstream commits that landed in their copy.
+
+  Then summarize in plain language:
+
+    - **No-op case** (rev unchanged): "Already up to date — nothing
+      new on `stable`."
+    - **Updated case** (rev advanced): list the kit-owned skills and
+      recipes that were refreshed, plus any that were left alone
+      because the user had edited them. The install script's stdout
+      will indicate which is which.
+
+  ## Step 6 — Restart Goose Desktop
+
+  Tell the user that Goose Desktop caches skills and recipes at
+  launch, so even though the files on disk are now updated, the
+  running Desktop session is still using the old versions. They
+  need to:
+
+    1. Quit Goose Desktop completely (not just close the window —
+       fully quit so the process dies).
+    2. Reopen it.
+    3. New or updated recipes will appear in the Recipes panel; new
+       or updated skills will be picked up on the next chat that
+       triggers them.
+
+  If they're using the Goose CLI rather than Desktop, the next
+  invocation reloads everything — no restart needed.
+
+  ## Step 7 — Confirm
+
+  Once the user has restarted (or confirmed they don't need to),
+  briefly confirm what's now active. If anything in the update
+  output looked off (verify-script warnings, refused-to-overwrite
+  notices the user didn't expect), surface it and walk through
+  `docs/TROUBLESHOOTING.md`.
+
+  ---
+
+  Important constraints:
+
+  - Never edit `~/.config/goose/config.yaml` from this recipe. The
+    updater is for kit-managed files under
+    `~/.config/goose/skills/` and `~/.config/goose/recipes/` only.
+  - If `git fetch` fails (no network, repo unreachable), report the
+    failure plainly and stop. Don't fall back to anything clever.
+  - If the user has unsaved local changes to a file the installer
+    would normally manage, the sha256 check protects them — but
+    explain that means they won't get the upstream fix for that
+    file until they either revert their local edit or accept the
+    overwrite manually.
+
+activities:
+  - "Snapshot the kit's current state"
+  - "Run update.sh / install.ps1"
+  - "Summarize what changed and prompt to restart Desktop"

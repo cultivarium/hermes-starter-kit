@@ -54,6 +54,9 @@ recipes:
   - name: set-up-notion
     path: recipes/set-up-notion.yaml
     sha256: TBD-AT-RELEASE
+  - name: update-kit
+    path: recipes/update-kit.yaml
+    sha256: TBD-AT-RELEASE
 
 # Names shown in the "what to try first" line of the post-install summary.
 starter_recipes_to_advertise:

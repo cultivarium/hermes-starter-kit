@@ -64,6 +64,7 @@ under the MIT license. Full attribution and license texts are in
 | [`create-a-skill`](recipes/create-a-skill.yaml) | Interactive walkthrough that helps you write a new skill from scratch. |
 | [`add-an-mcp-server`](recipes/add-an-mcp-server.yaml) | Interactive walkthrough for connecting any MCP-speaking data source. |
 | [`set-up-notion`](recipes/set-up-notion.yaml) | Guided setup for the kit's Notion connector — writes the right config block and walks you through Goose Desktop's Extensions UI. |
+| [`update-kit`](recipes/update-kit.yaml) | Pulls the latest skills and recipes from the public starter kit repo. Files you've edited locally are preserved. |
 
 ## First run
 
@@ -88,12 +89,19 @@ under the MIT license. Full attribution and license texts are in
 
 ## Updating
 
-Re-run the installer at any time. It is idempotent: pristine files
-are refreshed, files you've edited locally are left alone.
+Two ways:
 
-```bash
-bash ~/.config/goose/.starter-kit/scripts/install.sh
-```
+- **From inside Goose** (easiest): run the `update-kit` recipe from
+  the Recipes panel. It runs the kit's update script, summarizes
+  what changed, and prompts you to restart Goose Desktop.
+- **From a terminal**: re-run the installer.
+
+  ```bash
+  bash ~/.config/goose/.starter-kit/scripts/install.sh
+  ```
+
+Either path is idempotent: pristine files are refreshed, files
+you've edited locally are left alone.
 
 ## Customising
 
