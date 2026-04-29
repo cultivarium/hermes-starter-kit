@@ -79,11 +79,24 @@ log "Config dir: $GOOSE_CONFIG_DIR"
 
 # ---- 2. ensure goose -----------------------------------------------------
 log "Checking for Goose"
+GOOSE_BIN=""
 GOOSE_INSTALLED_VERSION=""
 if command -v goose >/dev/null 2>&1; then
-  GOOSE_INSTALLED_VERSION="$(goose --version 2>/dev/null \
+  GOOSE_BIN="goose"
+elif [[ -x "$HOME/.local/bin/goose" ]]; then
+  # macOS GUI apps launched via `open` inherit a minimal PATH that does
+  # not include ~/.local/bin/, so `command -v goose` misses Goose even
+  # when it was just placed there by the official AAIF installer. Probe
+  # the canonical install location directly so the kit is self-sufficient
+  # under non-PATH-aware callers (CI, Docker, Tauri-spawned shells).
+  GOOSE_BIN="$HOME/.local/bin/goose"
+fi
+
+if [[ -n "$GOOSE_BIN" ]]; then
+  GOOSE_INSTALLED_VERSION="$("$GOOSE_BIN" --version 2>/dev/null \
     | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)"
-  log "Found goose $GOOSE_INSTALLED_VERSION"
+  log "Found goose $GOOSE_INSTALLED_VERSION ($GOOSE_BIN)"
+  export GOOSE_BIN
 else
   warn "Goose is not installed."
   if (( NON_INTERACTIVE )); then
@@ -95,6 +108,13 @@ else
     log "Running official Goose installer"
     curl -fsSL https://github.com/aaif-goose/goose/releases/download/stable/download_cli.sh \
       | CONFIGURE=false bash
+    # The AAIF installer drops the binary at ~/.local/bin/goose. Pick it
+    # up directly so the rest of this script (and verify.sh) can use it
+    # without relying on the user's PATH being refreshed.
+    if [[ -x "$HOME/.local/bin/goose" ]]; then
+      GOOSE_BIN="$HOME/.local/bin/goose"
+      export GOOSE_BIN
+    fi
   else
     die "Aborting; install Goose and re-run."
   fi

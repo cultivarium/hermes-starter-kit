@@ -4,6 +4,24 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.1.3] — 2026-04-29
+
+### Fixed
+
+- **Kit installer detects Goose at `~/.local/bin/goose` directly**
+  when `command -v goose` fails. macOS GUI apps launched via
+  `open` (including the Hermes GUI installer's spawned shell)
+  inherit a minimal PATH that doesn't include `~/.local/bin/`,
+  so the kit installer previously reported "Goose not installed"
+  even when the AAIF script had just placed the binary there. The
+  GUI installer's PATH-prepend workaround stays in place as
+  defense in depth, but the kit installer is now self-sufficient
+  under non-PATH-aware callers (CI, Docker, Tauri-spawned shells).
+  Same probe added to `verify.sh`. After running the AAIF
+  installer to install Goose, `install.sh` now picks up the
+  freshly-placed binary directly without waiting for the user's
+  shell PATH to refresh.
+
 ## [0.1.2] — 2026-04-29
 
 ### Fixed

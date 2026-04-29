@@ -39,11 +39,22 @@ hdr()  { printf '\n\033[1m%s\033[0m\n' "$*"; }
 
 # 1. goose binary
 hdr "1. Goose binary"
-if command -v goose >/dev/null 2>&1; then
-  ver="$(goose --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
-  ok "goose found (version ${ver:-unknown})"
+# Honor GOOSE_BIN if install.sh exported one; otherwise probe PATH and
+# the canonical ~/.local/bin/goose location (macOS GUI-launched shells
+# have a sparse PATH that omits ~/.local/bin/).
+if [[ -z "${GOOSE_BIN:-}" ]]; then
+  if command -v goose >/dev/null 2>&1; then
+    GOOSE_BIN="goose"
+  elif [[ -x "$HOME/.local/bin/goose" ]]; then
+    GOOSE_BIN="$HOME/.local/bin/goose"
+  fi
+fi
+
+if [[ -n "${GOOSE_BIN:-}" ]]; then
+  ver="$("$GOOSE_BIN" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
+  ok "goose found (version ${ver:-unknown}) at $GOOSE_BIN"
 else
-  bad "goose binary not on PATH"
+  bad "goose binary not found (checked PATH and ~/.local/bin/goose)"
 fi
 
 # 2. config.yaml (informational; the installer no longer manages this file)
@@ -99,7 +110,7 @@ for rp in $RECIPE_PATHS; do
     continue
   fi
   # Prefer `goose recipe validate` if available; else best-effort YAML check.
-  if goose recipe validate "$rfile" >/dev/null 2>&1; then
+  if [[ -n "${GOOSE_BIN:-}" ]] && "$GOOSE_BIN" recipe validate "$rfile" >/dev/null 2>&1; then
     ok "$name: goose recipe validate ok"
   elif python3 - "$rfile" <<'PY' 2>/dev/null; then
 import sys
@@ -186,7 +197,7 @@ hdr "6. End-to-end recipe run"
 if [[ "${RUN_E2E:-0}" != "1" ]]; then
   skip "skipped (set RUN_E2E=1 to run; requires provider creds)"
 else
-  if goose session --no-interactive --recipe onboarding --max-turns 1 >/dev/null 2>&1; then
+  if [[ -n "${GOOSE_BIN:-}" ]] && "$GOOSE_BIN" session --no-interactive --recipe onboarding --max-turns 1 >/dev/null 2>&1; then
     ok "onboarding recipe ran one turn"
   else
     bad "onboarding recipe failed (auth? missing provider?)"
