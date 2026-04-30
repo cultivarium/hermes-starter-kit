@@ -4,6 +4,34 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] — 2026-04-30
+
+### Added
+
+- **`cultivarium-data` skill** — query Cultivarium's weekly CVM strain
+  dataset (genome assemblies, ORI plasmid screen results, growth/media
+  screen, MIC antibiotic susceptibility, methylation motifs and RM
+  gene annotations, ML-predicted optimal temperature / pH / salinity /
+  oxygen) by `curl | gunzip` against
+  `dt5rr68aivik7.cloudfront.net/downloads/`. No API keys, no auth.
+  Documents 14 datasets with column schemas, join keys, and worked
+  shell examples in `skills/cultivarium-data/reference/`.
+- **`genomespot-predictions` skill** — query GenomeSPOT-predicted
+  growth conditions (optimum / min / max temperature, pH, salinity,
+  and oxygen tolerance class) for ~16k bacterial and archaeal genomes
+  by NCBI assembly accession. Split from `cultivarium-data` because
+  the prediction corpus extends well beyond CVM strains; the
+  CVM-keyed framing of the same data stays available in
+  `cultivarium-data` for strain-centric workflows.
+
+### Changed
+
+- Curation pipeline grew a third source class — `kit-native` — for
+  skills authored directly for the public kit. Living source-of-truth
+  is `curation/kit-native-skills/` in the parent `goose-configuration`
+  repo. Existing `ai-scientist-skills` and `k-dense` flows are
+  unchanged.
+
 ## [0.1.3] — 2026-04-29
 
 ### Fixed

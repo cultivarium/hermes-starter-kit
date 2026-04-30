@@ -50,6 +50,8 @@ installer first.
 | [`pysam`](skills/pysam/) | Read/write SAM/BAM/CRAM/VCF/FASTQ for NGS workflows. Needs `samtools`/`bcftools` on the host. |
 | [`gget`](skills/gget/) | Fast unified CLI/Python access to ~20 bioinformatics databases (gene info, BLAST, AlphaFold). |
 | [`database-lookup`](skills/database-lookup/) | Single skill wrapping 78 public REST APIs (Reactome, KEGG, UniProt, STRING, PubChem, ChEMBL, Ensembl, ClinVar, …). |
+| [`cultivarium-data`](skills/cultivarium-data/) | Query Cultivarium's weekly CVM strain dataset — genomes, ORI screen results, growth/media, MIC, methylation, and predicted optimal growth conditions — via gzipped CSVs over CloudFront. |
+| [`genomespot-predictions`](skills/genomespot-predictions/) | Look up [GenomeSPOT](https://github.com/cultivarium/GenomeSPOT)-predicted growth conditions (temperature, pH, salinity, oxygen tolerance) for ~16k bacterial and archaeal genomes by NCBI assembly accession. |
 
 The `pysam`, `gget`, and `database-lookup` skills are vendored from
 [K-Dense's `claude-scientific-skills`](https://github.com/K-Dense-AI/claude-scientific-skills)

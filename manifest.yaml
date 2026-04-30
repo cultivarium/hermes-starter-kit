@@ -8,9 +8,9 @@
 # users through adding a connector when they want one.
 
 schema_version: 1
-kit_version: 0.1.3
+kit_version: 0.2.0
 min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
-released: "2026-04-29"
+released: "2026-04-30"
 
 # Skills are vendored under skills/<name>/ in this repo. The installer copies
 # each into ~/.config/goose/skills/<name>/ unless the user has modified the
@@ -33,6 +33,12 @@ skills:
     sha256: TBD-AT-RELEASE
   - name: database-lookup
     path: skills/database-lookup
+    sha256: TBD-AT-RELEASE
+  - name: cultivarium-data
+    path: skills/cultivarium-data
+    sha256: TBD-AT-RELEASE
+  - name: genomespot-predictions
+    path: skills/genomespot-predictions
     sha256: TBD-AT-RELEASE
 
 recipes:
