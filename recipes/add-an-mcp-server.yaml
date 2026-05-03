@@ -45,9 +45,15 @@ prompt: |
      a token, or nothing at all? What env vars does it expect? Stop
      and confirm the user has the credentials before moving on.
 
-  4. **Add the extension stanza** to
-     `~/.config/goose/config.yaml` under `extensions:`. Use the
-     developer extension's file tools to make the edit. The shape:
+  4. **Add the extension stanza** to Goose's config.yaml under
+     `extensions:`. The file lives at:
+
+       - macOS / Linux: `~/.config/goose/config.yaml`
+       - Windows: `%APPDATA%\Block\goose\config\config.yaml`
+         (typically `C:\Users\<you>\AppData\Roaming\Block\goose\config\config.yaml`)
+
+     Use the developer extension's file tools to make the edit. The
+     shape:
 
          <name>:
            type: stdio

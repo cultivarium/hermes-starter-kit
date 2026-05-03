@@ -9,8 +9,10 @@ description: >
 
 prompt: |
   Help the user connect Goose to Notion. Use the developer extension's
-  file-editing tools to write into the user's `~/.config/goose/config.yaml`,
-  then walk them through enabling the extension in Goose's Extensions UI.
+  file-editing tools to write into the user's Goose config.yaml
+  (`~/.config/goose/config.yaml` on macOS/Linux,
+  `%APPDATA%\Block\goose\config\config.yaml` on Windows), then walk
+  them through enabling the extension in Goose's Extensions UI.
 
   Stop and confirm with the user at every step. Do not skip steps.
   If anything goes wrong, surface it clearly — do not paper over.
@@ -159,6 +161,6 @@ prompt: |
     for OAuth dynamic-client-registration.
 
 activities:
-  - "Add notion to ~/.config/goose/config.yaml"
+  - "Add notion to Goose's config.yaml"
   - "Walk through enabling in Desktop's Extensions UI"
   - "Trigger the OAuth flow with a test query"

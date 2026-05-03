@@ -45,7 +45,8 @@ recipes like `weekly-lit-scan`.
 ## Switching provider after install
 
 Either re-run the installer (it'll re-prompt unless you pass `--update`)
-or edit `~/.config/goose/config.yaml` directly:
+or edit Goose's `config.yaml` directly — `~/.config/goose/config.yaml`
+on macOS/Linux, `%APPDATA%\Block\goose\config\config.yaml` on Windows:
 
 ```yaml
 GOOSE_PROVIDER: openai

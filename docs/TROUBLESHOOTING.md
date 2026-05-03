@@ -65,8 +65,9 @@ skills at session start.
 **The agent doesn't remember anything between sessions**
 
 Confirm the memory extension is enabled in Goose Desktop's Extensions
-panel (or in `~/.config/goose/config.yaml` under
-`extensions.memory.enabled: true`). The kit no longer enforces
+panel (or in Goose's `config.yaml` — `~/.config/goose/config.yaml` on
+macOS/Linux, `%APPDATA%\Block\goose\config\config.yaml` on Windows —
+under `extensions.memory.enabled: true`). The kit no longer enforces
 memory-on at install time — Goose's per-version default applies.
 
 If memory is enabled but the agent still seems amnesiac, try asking it
