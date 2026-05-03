@@ -3,8 +3,9 @@ title: "Create a new skill"
 description: >
   An interactive walkthrough that helps the user write a new Goose skill
   from scratch. The agent asks what task they want to automate, drafts a
-  SKILL.md in the correct format, saves it under ~/.config/goose/skills/,
-  and offers to test it.
+  SKILL.md in the correct format, saves it to the Goose skills dir
+  (`~/.config/goose/skills/` on macOS/Linux, `%APPDATA%\Block\goose\config\skills\`
+  on Windows), and offers to test it.
 
 prompt: |
   Help the user create a new Goose skill. Co-author it step by step
@@ -51,10 +52,14 @@ prompt: |
      should follow, any pitfalls or constraints, and one or two example
      prompts that should trigger it.
 
-  5. **Save.** Write the file to
-     `$HOME/.config/goose/skills/<name>/SKILL.md` (or the Windows
-     path). Use the developer extension's file tools. Confirm the path
-     back to the user.
+  5. **Save.** Write the file using the developer extension's file
+     tools to whichever path matches the user's OS:
+
+       - macOS / Linux: `$HOME/.config/goose/skills/<name>/SKILL.md`
+       - Windows: `%APPDATA%\Block\goose\config\skills\<name>\SKILL.md`
+         (typically `C:\Users\<you>\AppData\Roaming\Block\goose\config\skills\`)
+
+     Confirm the saved path back to the user.
 
   6. **Smoke test.** Offer to start a fresh session and try a prompt
      that should trigger the skill. If it doesn't trigger, suggest
@@ -90,5 +95,5 @@ parameters:
 
 activities:
   - "Walk the user through writing a SKILL.md"
-  - "Save it under ~/.config/goose/skills/"
+  - "Save it under the Goose skills directory"
   - "Smoke-test that it triggers"

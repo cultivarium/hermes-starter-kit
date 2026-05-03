@@ -4,8 +4,9 @@ The starter kit deliberately does **not** auto-configure data-source
 connectors at install time. Instead, each connector has a guided
 setup recipe that:
 
-1. writes the right `extensions.<name>` block into your
-   `~/.config/goose/config.yaml`,
+1. writes the right `extensions.<name>` block into your Goose
+   `config.yaml` (`~/.config/goose/config.yaml` on macOS/Linux,
+   `%APPDATA%\Block\goose\config\config.yaml` on Windows),
 2. walks you through enabling the extension in Goose Desktop's
    Extensions UI, and
 3. helps you trigger the vendor's OAuth flow on first use.
@@ -57,7 +58,8 @@ That recipe is a generic walkthrough for adding any MCP-speaking
 data source — local stdio or remote HTTP — and explains the schema,
 auth, and verification steps as it goes.
 
-You can also edit `~/.config/goose/config.yaml` directly:
+You can also edit Goose's `config.yaml` directly (`~/.config/goose/config.yaml`
+on macOS/Linux, `%APPDATA%\Block\goose\config\config.yaml` on Windows):
 
 ```yaml
 extensions:

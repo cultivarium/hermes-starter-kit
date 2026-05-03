@@ -99,7 +99,13 @@ Two ways:
 - **From a terminal**: re-run the installer.
 
   ```bash
+  # macOS / Linux
   bash ~/.config/goose/.starter-kit/scripts/install.sh
+  ```
+
+  ```powershell
+  # Windows
+  powershell -NoProfile -ExecutionPolicy Bypass -File "$env:APPDATA\Block\goose\config\.starter-kit\scripts\install.ps1"
   ```
 
 Either path is idempotent: pristine files are refreshed, files
@@ -108,10 +114,11 @@ you've edited locally are left alone.
 ## Customising
 
 The kit is meant to be a starting point, not a finished product. Once
-installed, files under `~/.config/goose/skills/` and
-`~/.config/goose/recipes/` are yours — edit them, add more, copy them
-into another agent. The next install run will detect your edits via
-sha256 fingerprint and won't clobber them.
+installed, the files under `skills/` and `recipes/` in your Goose
+config dir (`~/.config/goose/` on macOS/Linux, `%APPDATA%\Block\goose\config\`
+on Windows) are yours — edit them, add more, copy them into another
+agent. The next install run will detect your edits via sha256
+fingerprint and won't clobber them.
 
 ## Docs
 

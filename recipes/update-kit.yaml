@@ -59,7 +59,9 @@ prompt: |
       `git -C <kit-dir> rev-parse --short HEAD`
     - The list of files the installer currently manages, from
       `<goose-config-dir>/.starter-kit-state.json` (read it as JSON;
-      its keys are the relative paths under `~/.config/goose/`).
+      its keys are relative paths under the Goose config dir —
+      `~/.config/goose/` on macOS/Linux, `%APPDATA%\Block\goose\config\`
+      on Windows).
 
   Show the user the current rev and how many skills/recipes are
   currently tracked.
@@ -124,9 +126,11 @@ prompt: |
 
   Important constraints:
 
-  - Never edit `~/.config/goose/config.yaml` from this recipe. The
-    updater is for kit-managed files under
-    `~/.config/goose/skills/` and `~/.config/goose/recipes/` only.
+  - Never edit Goose's `config.yaml` from this recipe — the file at
+    `~/.config/goose/config.yaml` (macOS/Linux) or
+    `%APPDATA%\Block\goose\config\config.yaml` (Windows) is owned by
+    Goose's own configure flow. The updater is for kit-managed files
+    under the `skills/` and `recipes/` subdirectories only.
   - If `git fetch` fails (no network, repo unreachable), report the
     failure plainly and stop. Don't fall back to anything clever.
   - If the user has unsaved local changes to a file the installer

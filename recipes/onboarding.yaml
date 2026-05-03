@@ -23,10 +23,14 @@ prompt: |
      panel.
 
   2. **Tour the bundled skills.** Check which of these are present in
-     `~/.config/goose/skills/`: ncbi-datasets, codon-optimization,
-     protrek-search, pysam, gget, database-lookup. For each one
-     that's present, give a one-line description and one example
-     prompt the user could try later.
+     the Goose skills directory — `~/.config/goose/skills/` on
+     macOS/Linux, or `%APPDATA%\Block\goose\config\skills\` on Windows
+     (typically `C:\Users\<you>\AppData\Roaming\Block\goose\config\skills\`).
+     Look for: ncbi-datasets, codon-optimization, protrek-search,
+     pysam, gget, database-lookup. For each one that's present, give a
+     one-line description and one example prompt the user could try
+     later. Don't keep searching past that first directory listing —
+     anything not in `skills/` directly isn't installed.
 
   3. **Suggest enabling memory.** The kit ships memory disabled by
      default (Goose's per-version default applies). If the user
