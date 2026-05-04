@@ -82,14 +82,18 @@ jobs:
           Add-Content -Path $env:GITHUB_PATH -Value $stubDir
 
       # ---- fresh install ----
+      # As of v0.3.0 the installer is deliberately minimal: it doesn't
+      # touch config.yaml, choose a provider, or wire connectors —
+      # Goose's first-run flow + the `set-up-notion` recipe own those.
+      # We pass --no-desktop so CI doesn't try to install Goose Desktop
+      # (no display server in CI; we already stub the CLI above).
       - name: Run installer (fresh)
         if: runner.os != 'Windows'
         run: |
           bash ${{ matrix.installer }} \
             --kit-source "$PWD" \
             --prefix "$RUNNER_TEMP/goose-cfg" \
-            --provider anthropic \
-            --connectors notion \
+            --no-desktop \
             --non-interactive
 
       - name: Run installer (fresh, Windows)
@@ -98,8 +102,6 @@ jobs:
           & ${{ matrix.installer }} `
             -KitSource "$PWD" `
             -Prefix "$env:RUNNER_TEMP\goose-cfg" `
-            -Provider anthropic `
-            -Connectors notion `
             -NonInteractive
 
       # ---- verify the fresh install ----
@@ -124,14 +126,14 @@ jobs:
           bash ${{ matrix.installer }} \
             --kit-source "$PWD" \
             --prefix "$RUNNER_TEMP/goose-cfg" \
-            --update --non-interactive
+            --no-desktop --update --non-interactive
           # User-edit preservation check: tweak a skill file, re-run, confirm
           # the edit survives.
           echo "USER EDIT" >> "$RUNNER_TEMP/goose-cfg/skills/ncbi-datasets/SKILL.md"
           bash ${{ matrix.installer }} \
             --kit-source "$PWD" \
             --prefix "$RUNNER_TEMP/goose-cfg" \
-            --update --non-interactive
+            --no-desktop --update --non-interactive
           tail -1 "$RUNNER_TEMP/goose-cfg/skills/ncbi-datasets/SKILL.md" | grep -q "USER EDIT" \
             || { echo "user edit was clobbered"; exit 1; }
 
