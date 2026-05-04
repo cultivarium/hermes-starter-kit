@@ -4,6 +4,44 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.3.0] — 2026-05-04
+
+### Changed
+
+- **`install.sh` is now the "minimal CLI installer," not a full-stack
+  setup script.** Windows users belong on the Hermes GUI installer
+  (which detects + installs Git, Python, Goose CLI, Goose Desktop, and
+  the kit, then launches Goose). The CLI path is for sophisticated
+  macOS / Linux users who'd rather pipe a script than double-click an
+  app. The script now refuses to run on anything other than Darwin /
+  Linux and points Windows users at the GUI installer in its error
+  message.
+- **`install.sh` now installs Goose Desktop in addition to the CLI.**
+  Previously the script only ensured the Goose CLI was present. Now it
+  also detects and installs Goose Desktop:
+  - macOS: downloads `Goose.zip` (arm64) or `Goose_intel_mac.zip`
+    (x86_64) from the AAIF latest release and `ditto`s `Goose.app`
+    into `/Applications`. No sudo required.
+  - Linux: detects the host package manager (apt / dnf / yum / rpm /
+    flatpak), resolves the latest matching `.deb` / `.rpm` /
+    `.flatpak` asset URL via the GitHub releases API, and prompts
+    before `sudo`-installing it. Falls back to printing the release
+    URL when no supported package manager is detected or when running
+    under `--non-interactive`.
+- **New `--no-desktop` flag** to skip the Desktop install step
+  (headless servers, CI, anyone who only wants the CLI). `update.sh`
+  now passes this through automatically — repeat refreshes don't
+  re-pull the Desktop bundle.
+
+### Removed
+
+- **Legacy `--provider` and `--connectors` flag stubs** removed from
+  `install.sh`. They were silent no-ops kept for back-compat with
+  pre-public scripts; the public installer never honored them. Anyone
+  passing them now gets a hard `unknown arg` exit. Kit's other flags
+  (`--non-interactive`, `--prefix`, `--ref`, `--kit-source`,
+  `--update`) are unchanged.
+
 ## [0.2.0] — 2026-04-30
 
 ### Added

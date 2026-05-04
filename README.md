@@ -25,20 +25,21 @@ Goose itself.
 
 ## 60-second install
 
-**macOS / Linux:**
+**macOS / Linux** — minimal CLI installer (installs the Goose CLI, the
+Goose Desktop app, and the kit):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/cultivarium/hermes-starter-kit/stable/scripts/install.sh | bash
 ```
 
-**Windows (PowerShell):**
+**Windows** — use the [Hermes GUI installer](https://github.com/cultivarium/goose-configuration/tree/main/gui-installer).
+The CLI installer is macOS / Linux only; Windows users get the same end
+state through the double-click installer.
 
-```powershell
-irm https://raw.githubusercontent.com/cultivarium/hermes-starter-kit/stable/scripts/install.ps1 | iex
-```
-
-If Goose isn't installed yet, the script offers to run the official AAIF
-installer first.
+The CLI installer prompts before pulling the Goose CLI / Desktop if
+either is missing. Pass `--no-desktop` to skip the Desktop app
+(useful for headless / CI setups), or `--non-interactive` to fail
+fast instead of prompting.
 
 ## What you get
 
@@ -96,17 +97,13 @@ Two ways:
 - **From inside Goose** (easiest): run the `update-kit` recipe from
   the Recipes panel. It runs the kit's update script, summarizes
   what changed, and prompts you to restart Goose Desktop.
-- **From a terminal**: re-run the installer.
+- **From a terminal** (macOS / Linux): re-run the installer.
 
   ```bash
-  # macOS / Linux
   bash ~/.config/goose/.starter-kit/scripts/install.sh
   ```
 
-  ```powershell
-  # Windows
-  powershell -NoProfile -ExecutionPolicy Bypass -File "$env:APPDATA\Block\goose\config\.starter-kit\scripts\install.ps1"
-  ```
+  Windows users: re-run the Hermes GUI installer to refresh the kit.
 
 Either path is idempotent: pristine files are refreshed, files
 you've edited locally are left alone.

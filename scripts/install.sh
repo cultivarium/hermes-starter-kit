@@ -1,26 +1,30 @@
 #!/usr/bin/env bash
-# Hermes Starter Kit installer.
+# Hermes Starter Kit installer (CLI path).
 #
-# Installs the kit's skills and recipes into the user's Goose config
-# directory. The installer deliberately does NOT touch config.yaml,
-# the model provider, or extension/connector setup — Goose's first-run
-# flow handles provider/API-key entry, and the kit ships an
-# interactive recipe (`set-up-notion`) that walks the user through
-# adding a connector when they want one.
+# Minimal install for sophisticated users on macOS / Linux:
+#   1. checks deps (curl, git, python3)
+#   2. installs Goose CLI (if missing)
+#   3. installs Goose Desktop (if missing)
+#   4. installs the kit's skills and recipes into ~/.config/goose/
+#
+# Does NOT touch ~/.config/goose/config.yaml, choose a model provider, or
+# wire up extensions. Goose's first-run flow handles provider/API-key
+# entry; the kit ships a `set-up-notion` recipe for connector wiring.
+#
+# Windows users: use the Hermes GUI installer; this script does not
+# support Windows.
 #
 # Usage:
 #   curl -fsSL <repo>/scripts/install.sh | bash
-#   ./install.sh --update
+#   ./install.sh
 #
 # Flags:
-#   --update                 same install path as default; kept for backward
-#                            compatibility with users who scripted around it
-#   --non-interactive        fail on any required prompt (e.g. install Goose)
+#   --non-interactive        fail on any required prompt (CI/automation)
+#   --no-desktop             skip Goose Desktop install (CLI-only setup)
 #   --prefix <path>          override $GOOSE_CONFIG_DIR (testing)
 #   --ref <git-ref>          starter-kit ref to check out
 #   --kit-source <path>      use a local checkout instead of cloning (testing)
-#
-# This script's behaviour mirrors install.ps1 step-for-step. Keep them in sync.
+#   --update                 accepted for back-compat; re-running is idempotent
 
 set -euo pipefail
 
@@ -28,6 +32,7 @@ set -euo pipefail
 KIT_REPO="${KIT_REPO:-https://github.com/cultivarium/hermes-starter-kit.git}"
 KIT_REF="stable"
 NON_INTERACTIVE=0
+INSTALL_DESKTOP=1
 PREFIX=""
 KIT_SOURCE=""
 
@@ -36,13 +41,11 @@ while (( $# > 0 )); do
   case "$1" in
     --update)            shift ;;                # accepted for back-compat; no-op
     --non-interactive)   NON_INTERACTIVE=1; shift ;;
+    --no-desktop)        INSTALL_DESKTOP=0; shift ;;
     --prefix)            PREFIX="$2"; shift 2 ;;
     --ref)               KIT_REF="$2"; shift 2 ;;
     --kit-source)        KIT_SOURCE="$2"; shift 2 ;;
-    -h|--help)           sed -n '1,28p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    # Quiet legacy flags from <0.4.0; ignored with a hint so old scripts don't break loud.
-    --provider)          shift 2 ;;
-    --connectors)        shift 2 ;;
+    -h|--help)           sed -n '1,27p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "unknown arg: $1" >&2; exit 2 ;;
   esac
 done
@@ -68,17 +71,18 @@ require git
 require python3
 
 OS="$(uname -s)"
+ARCH="$(uname -m)"
 case "$OS" in
   Darwin|Linux) ;;
-  *) die "unsupported OS: $OS (use install.ps1 on Windows)" ;;
+  *) die "unsupported OS: $OS — Windows users should run the Hermes GUI installer." ;;
 esac
 
 GOOSE_CONFIG_DIR="${PREFIX:-${XDG_CONFIG_HOME:-$HOME/.config}/goose}"
 mkdir -p "$GOOSE_CONFIG_DIR"
 log "Config dir: $GOOSE_CONFIG_DIR"
 
-# ---- 2. ensure goose -----------------------------------------------------
-log "Checking for Goose"
+# ---- 2. ensure goose CLI -------------------------------------------------
+log "Checking for Goose CLI"
 GOOSE_BIN=""
 GOOSE_INSTALLED_VERSION=""
 if command -v goose >/dev/null 2>&1; then
@@ -98,11 +102,11 @@ if [[ -n "$GOOSE_BIN" ]]; then
   log "Found goose $GOOSE_INSTALLED_VERSION ($GOOSE_BIN)"
   export GOOSE_BIN
 else
-  warn "Goose is not installed."
+  warn "Goose CLI is not installed."
   if (( NON_INTERACTIVE )); then
     die "Goose missing and --non-interactive set; install Goose first."
   fi
-  read -r -p "Install Goose now from the official AAIF release? [Y/n]: " ans
+  read -r -p "Install Goose CLI now from the official AAIF release? [Y/n]: " ans
   ans="${ans:-Y}"
   if [[ "$ans" =~ ^[Yy]$ ]]; then
     log "Running official Goose installer"
@@ -120,7 +124,133 @@ else
   fi
 fi
 
-# ---- 3. fetch starter kit ------------------------------------------------
+# ---- 3. ensure goose Desktop --------------------------------------------
+install_desktop_macos() {
+  # AAIF doesn't publish a .dmg for Desktop; macOS bundles ship as zips:
+  #   Goose.zip            (Apple Silicon)
+  #   Goose_intel_mac.zip  (Intel)
+  # Both unzip to a top-level Goose.app we copy into /Applications via ditto.
+  local zip_name
+  case "$ARCH" in
+    arm64|aarch64) zip_name="Goose.zip" ;;
+    x86_64)        zip_name="Goose_intel_mac.zip" ;;
+    *) warn "unsupported macOS arch: $ARCH — skipping Desktop install."; return 0 ;;
+  esac
+  local url="https://github.com/aaif-goose/goose/releases/latest/download/$zip_name"
+  local tmp
+  tmp="$(mktemp -d)"
+  log "Downloading $url"
+  curl -fL --progress-bar -o "$tmp/$zip_name" "$url"
+  log "Unzipping Goose.app"
+  (cd "$tmp" && unzip -q -o "$zip_name")
+  if [[ ! -d "$tmp/Goose.app" ]]; then
+    rm -rf "$tmp"
+    warn "Goose.app missing from zip; skipping."
+    return 0
+  fi
+  if [[ -d "/Applications/Goose.app" ]]; then
+    log "Removing previous /Applications/Goose.app"
+    rm -rf "/Applications/Goose.app"
+  fi
+  log "Copying Goose.app to /Applications"
+  ditto --rsrc "$tmp/Goose.app" "/Applications/Goose.app"
+  rm -rf "$tmp"
+}
+
+install_desktop_linux() {
+  # AAIF Linux Desktop ships only as .deb / .rpm / .flatpak — installing
+  # any of these needs sudo or flatpak setup, and the asset filenames
+  # carry a version, so we resolve the asset URL via the GitHub API.
+  local url="" kind=""
+  if command -v apt >/dev/null 2>&1 || command -v apt-get >/dev/null 2>&1; then
+    kind="deb"
+    url="$(curl -fsSL https://api.github.com/repos/aaif-goose/goose/releases/latest \
+      | grep -oE '"browser_download_url": *"[^"]*\.deb"' \
+      | head -1 | sed -E 's/.*"([^"]+)"$/\1/')"
+  elif command -v dnf >/dev/null 2>&1 || command -v yum >/dev/null 2>&1 || command -v rpm >/dev/null 2>&1; then
+    kind="rpm"
+    url="$(curl -fsSL https://api.github.com/repos/aaif-goose/goose/releases/latest \
+      | grep -oE '"browser_download_url": *"[^"]*\.rpm"' \
+      | head -1 | sed -E 's/.*"([^"]+)"$/\1/')"
+  elif command -v flatpak >/dev/null 2>&1; then
+    kind="flatpak"
+    url="$(curl -fsSL https://api.github.com/repos/aaif-goose/goose/releases/latest \
+      | grep -oE '"browser_download_url": *"[^"]*\.flatpak"' \
+      | head -1 | sed -E 's/.*"([^"]+)"$/\1/')"
+  fi
+
+  if [[ -z "$url" ]]; then
+    warn "Could not detect a supported package manager (apt/dnf/flatpak)."
+    warn "Goose Desktop binaries: https://github.com/aaif-goose/goose/releases/latest"
+    return 0
+  fi
+
+  if (( NON_INTERACTIVE )); then
+    log "Goose Desktop available at: $url"
+    log "Skipping Desktop install in --non-interactive mode."
+    return 0
+  fi
+
+  read -r -p "Install Goose Desktop ($kind, requires sudo)? [Y/n]: " ans
+  ans="${ans:-Y}"
+  if [[ ! "$ans" =~ ^[Yy]$ ]]; then
+    log "Skipped Goose Desktop install. Get it later from: $url"
+    return 0
+  fi
+
+  local tmp pkg
+  tmp="$(mktemp -d)"
+  pkg="$tmp/$(basename "$url")"
+  log "Downloading $url"
+  curl -fL --progress-bar -o "$pkg" "$url"
+  case "$kind" in
+    deb)
+      if command -v apt >/dev/null 2>&1; then sudo apt install -y "$pkg"
+      else sudo dpkg -i "$pkg"
+      fi
+      ;;
+    rpm)
+      if command -v dnf >/dev/null 2>&1; then sudo dnf install -y "$pkg"
+      elif command -v yum >/dev/null 2>&1; then sudo yum install -y "$pkg"
+      else sudo rpm -i --replacepkgs "$pkg"
+      fi
+      ;;
+    flatpak) flatpak install -y --user "$pkg" ;;
+  esac
+  rm -rf "$tmp"
+}
+
+desktop_installed_macos() { [[ -d "/Applications/Goose.app" ]]; }
+desktop_installed_linux() {
+  command -v goose-desktop >/dev/null 2>&1 \
+    || (command -v dpkg >/dev/null 2>&1 && dpkg -s goose >/dev/null 2>&1) \
+    || (command -v rpm  >/dev/null 2>&1 && rpm  -q goose >/dev/null 2>&1) \
+    || (command -v flatpak >/dev/null 2>&1 && flatpak list --app 2>/dev/null | grep -qi goose)
+}
+
+if (( INSTALL_DESKTOP )); then
+  log "Checking for Goose Desktop"
+  case "$OS" in
+    Darwin)
+      if desktop_installed_macos; then
+        log "Goose Desktop already at /Applications/Goose.app"
+      else
+        install_desktop_macos
+      fi
+      ;;
+    Linux)
+      if desktop_installed_linux; then
+        log "Goose Desktop already installed"
+      else
+        install_desktop_linux
+      fi
+      ;;
+  esac
+else
+  log "Skipping Goose Desktop (--no-desktop)"
+fi
+
+# ---- 4. fetch starter kit -----------------------------------------------
 STARTER_DIR="$GOOSE_CONFIG_DIR/.starter-kit"
 
 if [[ -n "$KIT_SOURCE" ]]; then
@@ -155,7 +285,7 @@ if [[ -n "$GOOSE_INSTALLED_VERSION" ]] \
   warn "Continuing anyway; some skills/recipes may not work."
 fi
 
-# ---- 4. install skills/recipes (sha256-tracked for idempotency) --------
+# ---- 5. install skills/recipes (sha256-tracked for idempotency) --------
 # State file: maps every relative path the installer has ever written to
 # the sha256 of what we wrote there. On re-run, files whose on-disk hash
 # still matches the recorded sha are pristine and safe to overwrite;
@@ -171,7 +301,7 @@ python3 "$STARTER_DIR/scripts/lib/install-files.py" \
   "$STARTER_DIR" "$GOOSE_CONFIG_DIR" "$STATE_FILE" \
   "$SKILL_PATHS" "$RECIPE_PATHS"
 
-# ---- 5. verify ----------------------------------------------------------
+# ---- 6. verify ----------------------------------------------------------
 if [[ -x "$STARTER_DIR/scripts/lib/verify.sh" ]]; then
   log "Running verify.sh"
   GOOSE_CONFIG_DIR="$GOOSE_CONFIG_DIR" STARTER_DIR="$STARTER_DIR" \
@@ -179,7 +309,7 @@ if [[ -x "$STARTER_DIR/scripts/lib/verify.sh" ]]; then
     warn "verify.sh reported issues; see output above."
 fi
 
-# ---- 6. summary ---------------------------------------------------------
+# ---- 7. summary ---------------------------------------------------------
 ADVERTISE=$(python3 "$STARTER_DIR/scripts/lib/extract-paths.py" \
   "$MANIFEST" starter_recipes_to_advertise)
 
