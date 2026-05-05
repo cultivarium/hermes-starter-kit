@@ -100,13 +100,6 @@ prompt: |
     re-run the installer and pick it there — that path is
     update-safe.
 
-parameters:
-  - key: server
-    input_type: string
-    requirement: optional
-    default: ""
-    description: "Name of the MCP server to add (npm package or service name). Leave blank to be asked."
-
 activities:
   - "Find an MCP server for the task"
   - "Add the extension stanza to config.yaml"

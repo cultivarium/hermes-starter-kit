@@ -89,18 +89,6 @@ prompt: |
     offer a shortcut: ask them only for the task and the name, draft
     the rest in one pass, and read it back for approval before saving.
 
-parameters:
-  - key: task
-    input_type: string
-    requirement: optional
-    default: ""
-    description: "Short description of what the new skill should do. Leave blank to be asked interactively."
-  - key: name
-    input_type: string
-    requirement: optional
-    default: ""
-    description: "Skill name in kebab-case (e.g. 'extract-methods'). Leave blank to be suggested."
-
 activities:
   - "Walk the user through writing a SKILL.md"
   - "Save it under the Goose skills directory"
