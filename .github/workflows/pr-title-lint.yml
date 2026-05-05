@@ -1,0 +1,42 @@
+# Enforce Conventional-Commit-style PR titles so release-please can
+# group changes into the right CHANGELOG section and pick the right
+# version-bump level when the Release PR is merged.
+#
+# Allowed types match the `changelog-sections` list in
+# release-please-config.json.
+
+name: pr-title-lint
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            refactor
+            revert
+            docs
+            chore
+            ci
+            test
+          requireScope: false
+          subjectPattern: ^[A-Za-z0-9].+$
+          subjectPatternError: |
+            The PR title subject must start with an alphanumeric character.
+            Examples:
+              feat: add iGEM competition skills
+              fix: handle empty manifest entries
+              ci: pin actions to major versions

@@ -1,0 +1,64 @@
+# Maintain an open "Release PR" against `main` that bumps kit_version
+# in manifest.yaml and prepends a draft entry to CHANGELOG.md, based on
+# Conventional Commit titles since the last tag.
+#
+# Merging the Release PR creates a `vX.Y.Z` tag on `main`. The
+# promote-stable workflow then fast-forwards `stable` to that tag.
+#
+# After release-please updates the PR, this workflow also runs
+# scripts/lib/update-release-fields.py on the release branch to fill
+# real sha256 rollups + today's `released:` date into manifest.yaml,
+# committing the result back to the PR.
+
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_pr_branch: ${{ steps.rp.outputs.pr && fromJSON(steps.rp.outputs.pr).headBranchName }}
+      release_pr_number: ${{ steps.rp.outputs.pr && fromJSON(steps.rp.outputs.pr).number }}
+      release_created:   ${{ steps.rp.outputs.release_created }}
+      tag_name:          ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  refresh-manifest-fields:
+    needs: release-please
+    if: needs.release-please.outputs.release_pr_branch != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.release_pr_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Refresh sha256 rollups + released date
+        run: python3 scripts/lib/update-release-fields.py manifest.yaml
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet manifest.yaml; then
+            echo "manifest.yaml already up-to-date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.yaml
+          git commit -m "chore: refresh sha256 rollups + released date"
+          git push origin HEAD:${{ needs.release-please.outputs.release_pr_branch }}
