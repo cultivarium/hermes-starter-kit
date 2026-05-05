@@ -4,6 +4,13 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.3.1](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.0...v0.3.1) (2026-05-05)
+
+
+### Fixed
+
+* restore released date to v0.3.0's actual release date ([#5](https://github.com/cultivarium/hermes-starter-kit/issues/5)) ([e39a9cf](https://github.com/cultivarium/hermes-starter-kit/commit/e39a9cf55bfaf81f9c106703b3f5c75c9309d3fc))
+
 ## [0.3.0] — 2026-05-04
 
 ### Changed
