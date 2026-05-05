@@ -4,6 +4,14 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.4.1](https://github.com/cultivarium/hermes-starter-kit/compare/v0.4.0...v0.4.1) (2026-05-05)
+
+
+### Fixed
+
+* drop unused parameter blocks from two recipes ([#12](https://github.com/cultivarium/hermes-starter-kit/issues/12)) ([73af6dc](https://github.com/cultivarium/hermes-starter-kit/commit/73af6dcf4198edd4b11871cd4b5417928bab713e))
+* rename update-kit recipe and clarify SKILL.md filename ([#11](https://github.com/cultivarium/hermes-starter-kit/issues/11)) ([ae79960](https://github.com/cultivarium/hermes-starter-kit/commit/ae79960238e6d31cc64307a965ea42b1761ff548))
+
 ## [0.4.0](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.2...v0.4.0) (2026-05-05)
 
 
