@@ -1,5 +1,5 @@
 version: "1.0.0"
-title: "Update the Hermes Starter Kit"
+title: "Get Latest Updates"
 description: >
   Pulls the latest skills and recipes from the public starter kit
   repository and refreshes the local copy. Runs the kit's own
