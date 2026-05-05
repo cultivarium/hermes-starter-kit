@@ -4,6 +4,13 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.3.3](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.2...v0.3.3) (2026-05-05)
+
+
+### Added
+
+* list iGEM skills in README "What you get" table ([#9](https://github.com/cultivarium/hermes-starter-kit/issues/9)) ([f50ba38](https://github.com/cultivarium/hermes-starter-kit/commit/f50ba38caa8eae6bb6f52abdee0a3479446fc733))
+
 ## [0.3.2](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.1...v0.3.2) (2026-05-05)
 
 
