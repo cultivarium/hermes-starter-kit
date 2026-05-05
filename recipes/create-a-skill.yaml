@@ -18,6 +18,12 @@ prompt: |
   They have a YAML frontmatter block followed by markdown instructions
   the agent will read when the skill triggers.
 
+  **The filename must be exactly `SKILL.md`** — uppercase `SKILL`,
+  lowercase `.md` extension. Goose only loads skills from files with
+  this exact name; `skill.md`, `Skill.md`, or `SKILL.markdown` will
+  be ignored. The skill's identity comes from the parent directory
+  name (`<skill-name>/`), not the filename.
+
   Minimal SKILL.md format:
 
       ---
@@ -53,7 +59,9 @@ prompt: |
      prompts that should trigger it.
 
   5. **Save.** Write the file using the developer extension's file
-     tools to whichever path matches the user's OS:
+     tools to whichever path matches the user's OS. The filename
+     **must be exactly `SKILL.md`** (uppercase `SKILL`, lowercase
+     `.md`) — Goose will not load it under any other name:
 
        - macOS / Linux: `$HOME/.config/goose/skills/<name>/SKILL.md`
        - Windows: `%APPDATA%\Block\goose\config\skills\<name>\SKILL.md`
