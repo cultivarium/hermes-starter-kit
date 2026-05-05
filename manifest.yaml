@@ -48,6 +48,12 @@ skills:
   - name: genomespot-predictions
     path: skills/genomespot-predictions
     sha256: f64e603e9272f8e19dface2f1753c0dac27116e9cb36360a0cb722d2f39a1772
+  - name: igem-competition-helper
+    path: skills/igem-competition-helper
+    sha256: TBD-AT-RELEASE
+  - name: igem-past-winners
+    path: skills/igem-past-winners
+    sha256: TBD-AT-RELEASE
 
 recipes:
   - name: onboarding
