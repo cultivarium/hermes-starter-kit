@@ -1,0 +1,37 @@
+# Fast-forward the `stable` branch to a newly-pushed tag.
+#
+# Stable-tracking policy is "Option A": every tagged release immediately
+# becomes what users on the curl/irm install URL see. Previously this
+# was done by a manual `git push origin "$TAG^{commit}:refs/heads/stable"`
+# in scripts/release.sh (over in goose-configuration). Now release-please
+# creates the tag when its Release PR is merged, and this workflow
+# promotes stable.
+#
+# We push the tag's commit to refs/heads/stable WITHOUT --force; the
+# push will fail if stable isn't an ancestor, surfacing a problem
+# rather than clobbering remote state.
+
+name: promote-stable
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve tag commit
+        id: ref
+        run: echo "sha=$(git rev-list -n 1 "${GITHUB_REF}")" >> "$GITHUB_OUTPUT"
+      - name: Fast-forward stable
+        run: |
+          git push origin "${{ steps.ref.outputs.sha }}:refs/heads/stable"
+          echo "Pushed ${{ steps.ref.outputs.sha }} to stable for tag ${GITHUB_REF#refs/tags/}"

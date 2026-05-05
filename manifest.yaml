@@ -1,16 +1,22 @@
 # Manifest for the Hermes Starter Kit. The installer reads this to:
 #   - know which skills/recipes to vendor and where
-#   - track per-file sha256 for idempotent updates
 #   - advertise "try these first" recipes in the post-install summary
 #
 # The installer installs skills + recipes only. Goose's own first-run
 # flow handles provider setup, and the `set-up-notion` recipe walks
 # users through adding a connector when they want one.
+#
+# Per-skill / per-recipe `sha256:` is a content-rollup hash, refreshed
+# at release time by scripts/lib/update-release-fields.py and used for
+# external manifest-integrity checks. The installer does NOT consume
+# it (it computes its own per-file sha256s on disk and tracks them in
+# .starter-kit-state.json). `kit_version` and `released` are bumped
+# automatically by release-please on each Release PR.
 
 schema_version: 1
 kit_version: 0.3.0
 min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
-released: "2026-05-04"
+released: "2026-05-05"
 
 # Skills are vendored under skills/<name>/ in this repo. The installer copies
 # each into ~/.config/goose/skills/<name>/ unless the user has modified the
@@ -18,51 +24,51 @@ released: "2026-05-04"
 skills:
   - name: ncbi-datasets
     path: skills/ncbi-datasets
-    sha256: TBD-AT-RELEASE
+    sha256: 6b98573fe4bff4494e9f701259de594f6d484447fbe9cb53538506c213d3ada9
   - name: codon-optimization
     path: skills/codon-optimization
-    sha256: TBD-AT-RELEASE
+    sha256: 087ce9228ed45eb62a036898cf2d8514c8d7f3120f020bae1ceae955d3eb79ba
   - name: protrek-search
     path: skills/protrek-search
-    sha256: TBD-AT-RELEASE
+    sha256: 7231651adac5429fcbd785972158ccbd6d3b10ff38416153201d1a03bb972776
   - name: pysam
     path: skills/pysam
-    sha256: TBD-AT-RELEASE
+    sha256: a6b7f4fa26377614917f4825ca367cabffad4974d8549984137dd7e8a6276a1e
   - name: gget
     path: skills/gget
-    sha256: TBD-AT-RELEASE
+    sha256: a6ca8cce6520d048a8b2d1a8c733a2c0a9102bf4078a2d1d637917c884717c9e
   - name: database-lookup
     path: skills/database-lookup
-    sha256: TBD-AT-RELEASE
+    sha256: 5c00e1ce79f9862bd047af23748211eeb063bf800e10ae897b60b5c236f2ca1f
   - name: cultivarium-data
     path: skills/cultivarium-data
-    sha256: TBD-AT-RELEASE
+    sha256: 747f74696b03b41343523aa2b8be0249875cb97e39d90af2814125167e5e4111
   - name: genomespot-predictions
     path: skills/genomespot-predictions
-    sha256: TBD-AT-RELEASE
+    sha256: f64e603e9272f8e19dface2f1753c0dac27116e9cb36360a0cb722d2f39a1772
 
 recipes:
   - name: onboarding
     path: recipes/onboarding.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: 16932104bd4a5670cf1fedd86c27c8ab40bdcb1774b1d8bbe8e59c41ee528a9b
   - name: summarize-pubmed
     path: recipes/summarize-pubmed.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: 7975b04058e00a0aebf056cd957f98bb2ff0defca82743cae70950caee12c91a
   - name: weekly-lit-scan
     path: recipes/weekly-lit-scan.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: e930c8adb7bb1d20a4872a32030611e76eea40911fa9e8dc36b82b10556df46f
   - name: create-a-skill
     path: recipes/create-a-skill.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: 40a4b3b1b71debb0e88117a6b9fc3860f6e3eccf545845897d3fb3bd45980cfc
   - name: add-an-mcp-server
     path: recipes/add-an-mcp-server.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: 5802215b18302329395b54e31a151b98065f70b6a657a105805a3c826886b87d
   - name: set-up-notion
     path: recipes/set-up-notion.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: 4064250f1fa32f7ad7b3a7024860cbaa504a3fd0a2b2abf9c9b11f77acf836dd
   - name: update-kit
     path: recipes/update-kit.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: ba106efc022d01ba9f6c6265136db48d261f045424608348cca72fb3790c2ea6
 
 # Names shown in the "what to try first" line of the post-install summary.
 starter_recipes_to_advertise:
