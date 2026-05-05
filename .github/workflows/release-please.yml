@@ -3,12 +3,17 @@
 # Conventional Commit titles since the last tag.
 #
 # Merging the Release PR creates a `vX.Y.Z` tag on `main`. The
-# promote-stable workflow then fast-forwards `stable` to that tag.
+# `promote-stable` job below then fast-forwards `stable` to that tag.
+# (This must run inline in the same workflow rather than as a
+# separate workflow listening on `push: tags`, because tags pushed
+# by GITHUB_TOKEN do NOT trigger downstream workflow runs — GitHub's
+# anti-loop protection. promote-stable.yml exists as a manual
+# workflow_dispatch fallback only.)
 #
-# After release-please updates the PR, this workflow also runs
-# scripts/lib/update-release-fields.py on the release branch to fill
-# real sha256 rollups + today's `released:` date into manifest.yaml,
-# committing the result back to the PR.
+# After release-please updates the PR (but before merge), this
+# workflow also runs scripts/lib/update-release-fields.py on the
+# release branch to fill real sha256 rollups + today's `released:`
+# date into manifest.yaml, committing the result back to the PR.
 
 name: release-please
 
@@ -62,3 +67,21 @@ jobs:
           git add manifest.yaml
           git commit -m "chore: refresh sha256 rollups + released date"
           git push origin HEAD:${{ needs.release-please.outputs.release_pr_branch }}
+
+  promote-stable:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fast-forward stable to release tag
+        env:
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          SHA=$(git rev-list -n 1 "refs/tags/${TAG_NAME}")
+          echo "Promoting stable to ${TAG_NAME} (${SHA})"
+          git push origin "${SHA}:refs/heads/stable"
