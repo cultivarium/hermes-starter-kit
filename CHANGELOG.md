@@ -4,12 +4,13 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
-## [0.3.3](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.2...v0.3.3) (2026-05-05)
+## [0.4.0](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.2...v0.4.0) (2026-05-05)
 
 
 ### Added
 
-* list iGEM skills in README "What you get" table ([#9](https://github.com/cultivarium/hermes-starter-kit/issues/9)) ([f50ba38](https://github.com/cultivarium/hermes-starter-kit/commit/f50ba38caa8eae6bb6f52abdee0a3479446fc733))
+* `igem-competition-helper` and `igem-past-winners` skills — iGEM competition guidance (registration, deliverables, medal criteria, human practices) backed by 87 official docs, plus a retrospective awards lookup covering 2015–2025 with a 3,747-team metadata index ([#3](https://github.com/cultivarium/hermes-starter-kit/issues/3)) ([540f472](https://github.com/cultivarium/hermes-starter-kit/commit/540f4720d03b48bcb6afd2432946bfbb00bba027))
+* List iGEM skills in README "What you get" table ([#9](https://github.com/cultivarium/hermes-starter-kit/issues/9)) ([f50ba38](https://github.com/cultivarium/hermes-starter-kit/commit/f50ba38caa8eae6bb6f52abdee0a3479446fc733))
 
 ## [0.3.2](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.1...v0.3.2) (2026-05-05)
 
