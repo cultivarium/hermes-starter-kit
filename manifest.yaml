@@ -1,7 +1,7 @@
 schema_version: 1
 kit_version: 0.3.1
 min_goose_version: 1.32.0
-released: '2026-05-04'
+released: "2026-05-05"
 skills:
   - name: ncbi-datasets
     path: skills/ncbi-datasets
