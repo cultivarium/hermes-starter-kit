@@ -1,22 +1,24 @@
-# Fast-forward the `stable` branch to a newly-pushed tag.
+# Manual fallback for promoting `stable` to a tag commit.
 #
-# Stable-tracking policy is "Option A": every tagged release immediately
-# becomes what users on the curl/irm install URL see. Previously this
-# was done by a manual `git push origin "$TAG^{commit}:refs/heads/stable"`
-# in scripts/release.sh (over in goose-configuration). Now release-please
-# creates the tag when its Release PR is merged, and this workflow
-# promotes stable.
+# Steady-state, the `promote-stable` job in release-please.yml does
+# this automatically when a Release PR is merged. This workflow exists
+# only for manual recovery — e.g., if the inline job didn't run, or
+# someone wants to re-point stable at an older tag.
 #
-# We push the tag's commit to refs/heads/stable WITHOUT --force; the
-# push will fail if stable isn't an ancestor, surfacing a problem
-# rather than clobbering remote state.
+# Note: a `push: tags` trigger does NOT work here because tags pushed
+# by GITHUB_TOKEN (which is what release-please-action uses) do not
+# trigger downstream workflows. That's why this is workflow_dispatch
+# only.
 
 name: promote-stable
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to promote stable to (e.g. v0.3.1)"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -28,10 +30,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Resolve tag commit
-        id: ref
-        run: echo "sha=$(git rev-list -n 1 "${GITHUB_REF}")" >> "$GITHUB_OUTPUT"
-      - name: Fast-forward stable
+      - name: Fast-forward stable to tag
+        env:
+          TAG_NAME: ${{ inputs.tag }}
         run: |
-          git push origin "${{ steps.ref.outputs.sha }}:refs/heads/stable"
-          echo "Pushed ${{ steps.ref.outputs.sha }} to stable for tag ${GITHUB_REF#refs/tags/}"
+          if ! git rev-parse -q --verify "refs/tags/${TAG_NAME}" >/dev/null; then
+            echo "ERROR: tag ${TAG_NAME} does not exist" >&2
+            exit 1
+          fi
+          SHA=$(git rev-list -n 1 "refs/tags/${TAG_NAME}")
+          echo "Promoting stable to ${TAG_NAME} (${SHA})"
+          git push origin "${SHA}:refs/heads/stable"

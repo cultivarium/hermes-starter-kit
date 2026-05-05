@@ -1,7 +1,28 @@
+# Manifest for the Hermes Starter Kit. The installer reads this to:
+#   - know which skills/recipes to vendor and where
+#   - advertise "try these first" recipes in the post-install summary
+#
+# The installer installs skills + recipes only. Goose's own first-run
+# flow handles provider setup, and the `set-up-notion` recipe walks
+# users through adding a connector when they want one.
+#
+# Per-skill / per-recipe `sha256:` is a content-rollup hash, refreshed
+# at release time by scripts/lib/update-release-fields.py and used for
+# external manifest-integrity checks. The installer does NOT consume
+# it (it computes its own per-file sha256s on disk and tracks them in
+# .starter-kit-state.json). `kit_version` and `released` are bumped
+# automatically by release-please on each Release PR.
+
 schema_version: 1
+# x-release-please-start-version
 kit_version: 0.3.1
-min_goose_version: 1.32.0
+# x-release-please-end
+min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
 released: "2026-05-05"
+
+# Skills are vendored under skills/<name>/ in this repo. The installer copies
+# each into ~/.config/goose/skills/<name>/ unless the user has modified the
+# on-disk copy (detected via sha256 comparison against .starter-kit-state.json).
 skills:
   - name: ncbi-datasets
     path: skills/ncbi-datasets
@@ -27,6 +48,7 @@ skills:
   - name: genomespot-predictions
     path: skills/genomespot-predictions
     sha256: f64e603e9272f8e19dface2f1753c0dac27116e9cb36360a0cb722d2f39a1772
+
 recipes:
   - name: onboarding
     path: recipes/onboarding.yaml
@@ -49,5 +71,7 @@ recipes:
   - name: update-kit
     path: recipes/update-kit.yaml
     sha256: ba106efc022d01ba9f6c6265136db48d261f045424608348cca72fb3790c2ea6
+
+# Names shown in the "what to try first" line of the post-install summary.
 starter_recipes_to_advertise:
   - set-up-notion

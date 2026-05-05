@@ -16,7 +16,7 @@
     {"type": "test",     "section": "Miscellaneous", "hidden": true}
   ],
   "extra-files": [
-    {"type": "yaml", "path": "manifest.yaml", "jsonpath": "$.kit_version"}
+    {"type": "generic", "path": "manifest.yaml"}
   ],
   "packages": {
     ".": {
