@@ -15,7 +15,7 @@
 
 schema_version: 1
 # x-release-please-start-version
-kit_version: 0.3.2
+kit_version: 0.4.0
 # x-release-please-end
 min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
 released: "2026-05-05"
@@ -50,10 +50,10 @@ skills:
     sha256: f64e603e9272f8e19dface2f1753c0dac27116e9cb36360a0cb722d2f39a1772
   - name: igem-competition-helper
     path: skills/igem-competition-helper
-    sha256: TBD-AT-RELEASE
+    sha256: 9a3745c82fa071e57dbb8cb278c9549b9ba5bcadd9634f666fd00c1ff88629e3
   - name: igem-past-winners
     path: skills/igem-past-winners
-    sha256: TBD-AT-RELEASE
+    sha256: f14b6f73e38a0e051940171df3cf307d8f373096c3c1da1dd7af25289fd9b99a
 
 recipes:
   - name: onboarding
