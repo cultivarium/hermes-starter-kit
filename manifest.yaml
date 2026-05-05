@@ -67,16 +67,16 @@ recipes:
     sha256: e930c8adb7bb1d20a4872a32030611e76eea40911fa9e8dc36b82b10556df46f
   - name: create-a-skill
     path: recipes/create-a-skill.yaml
-    sha256: 40a4b3b1b71debb0e88117a6b9fc3860f6e3eccf545845897d3fb3bd45980cfc
+    sha256: 23eca95faf0519841fa57d8a92220d87620c96b60f8317fd853ca0696ab1acdf
   - name: add-an-mcp-server
     path: recipes/add-an-mcp-server.yaml
-    sha256: 5802215b18302329395b54e31a151b98065f70b6a657a105805a3c826886b87d
+    sha256: 3e56e3536c9c7ef641441fdacc502f94d85d676fa6f85121c7b0137dfad41e68
   - name: set-up-notion
     path: recipes/set-up-notion.yaml
     sha256: 4064250f1fa32f7ad7b3a7024860cbaa504a3fd0a2b2abf9c9b11f77acf836dd
   - name: update-kit
     path: recipes/update-kit.yaml
-    sha256: ba106efc022d01ba9f6c6265136db48d261f045424608348cca72fb3790c2ea6
+    sha256: ba77904feb1902e16036bbd779dac044d7d14e64a95c164cdae0fdd0bcf7e26d
 
 # Names shown in the "what to try first" line of the post-install summary.
 starter_recipes_to_advertise:
