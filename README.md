@@ -53,6 +53,8 @@ fast instead of prompting.
 | [`database-lookup`](skills/database-lookup/) | Single skill wrapping 78 public REST APIs (Reactome, KEGG, UniProt, STRING, PubChem, ChEMBL, Ensembl, ClinVar, …). |
 | [`cultivarium-data`](skills/cultivarium-data/) | Query Cultivarium's weekly CVM strain dataset — genomes, ORI screen results, growth/media, MIC, methylation, and predicted optimal growth conditions — via gzipped CSVs over CloudFront. |
 | [`genomespot-predictions`](skills/genomespot-predictions/) | Look up [GenomeSPOT](https://github.com/cultivarium/GenomeSPOT)-predicted growth conditions (temperature, pH, salinity, oxygen tolerance) for ~16k bacterial and archaeal genomes by NCBI assembly accession. |
+| [`igem-competition-helper`](skills/igem-competition-helper/) | Help iGEM participants prepare for the competition — registration, deliverables, medal criteria, human practices, parts/chassis — grounded in 87 documents scraped from the official iGEM sites. |
+| [`igem-past-winners`](skills/igem-past-winners/) | Look up retrospective iGEM results from 2015–2025: grand prizes, gold/silver/bronze medals, special prizes, village awards, and a 3,747-team metadata index for direct team lookup. |
 
 The `pysam`, `gget`, and `database-lookup` skills are vendored from
 [K-Dense's `claude-scientific-skills`](https://github.com/K-Dense-AI/claude-scientific-skills)
