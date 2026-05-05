@@ -4,6 +4,13 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.3.2](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.1...v0.3.2) (2026-05-05)
+
+
+### Fixed
+
+* promote stable inline + use generic updater to preserve manifest formatting ([#7](https://github.com/cultivarium/hermes-starter-kit/issues/7)) ([74613aa](https://github.com/cultivarium/hermes-starter-kit/commit/74613aa782dd3e6693538c533e0c7120f6f81bd7))
+
 ## [0.3.1](https://github.com/cultivarium/hermes-starter-kit/compare/v0.3.0...v0.3.1) (2026-05-05)
 
 
