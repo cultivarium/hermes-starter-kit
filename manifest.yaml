@@ -54,6 +54,9 @@ skills:
   - name: igem-past-winners
     path: skills/igem-past-winners
     sha256: f14b6f73e38a0e051940171df3cf307d8f373096c3c1da1dd7af25289fd9b99a
+  - name: igem-projects
+    path: skills/igem-projects
+    sha256: TBD-AT-RELEASE
 
 recipes:
   - name: onboarding
