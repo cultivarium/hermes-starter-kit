@@ -15,10 +15,10 @@
 
 schema_version: 1
 # x-release-please-start-version
-kit_version: 0.4.1
+kit_version: 0.4.2
 # x-release-please-end
 min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
-released: "2026-05-05"
+released: "2026-05-06"
 
 # Skills are vendored under skills/<name>/ in this repo. The installer copies
 # each into ~/.config/goose/skills/<name>/ unless the user has modified the
@@ -56,7 +56,7 @@ skills:
     sha256: f14b6f73e38a0e051940171df3cf307d8f373096c3c1da1dd7af25289fd9b99a
   - name: igem-projects
     path: skills/igem-projects
-    sha256: TBD-AT-RELEASE
+    sha256: 9898fa8bc385f17653df1599925df91d8d9e9566db090a54a6dd6a9047c09667
 
 recipes:
   - name: onboarding
@@ -73,16 +73,16 @@ recipes:
     sha256: 23eca95faf0519841fa57d8a92220d87620c96b60f8317fd853ca0696ab1acdf
   - name: add-an-mcp-server
     path: recipes/add-an-mcp-server.yaml
-    sha256: 3e56e3536c9c7ef641441fdacc502f94d85d676fa6f85121c7b0137dfad41e68
+    sha256: 77ede021ec952df24e52b79bc4db822dff697110f44c9802fe9367363e8db88a
   - name: set-up-notion
     path: recipes/set-up-notion.yaml
-    sha256: 4064250f1fa32f7ad7b3a7024860cbaa504a3fd0a2b2abf9c9b11f77acf836dd
+    sha256: 8f199b83ebba1aa4dfb39a083c753155f14362cbf02799afb2e4f9a5a20b758c
   - name: update-kit
     path: recipes/update-kit.yaml
     sha256: ba77904feb1902e16036bbd779dac044d7d14e64a95c164cdae0fdd0bcf7e26d
   - name: igem-assistant
     path: recipes/igem-assistant.yaml
-    sha256: TBD-AT-RELEASE
+    sha256: a471116e8cc455f0959d663a8cc5bbac049adcae50121965743413057b07a30c
 
 # Names shown in the "what to try first" line of the post-install summary.
 starter_recipes_to_advertise:
