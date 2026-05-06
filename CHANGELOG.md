@@ -4,6 +4,19 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.4.2](https://github.com/cultivarium/hermes-starter-kit/compare/v0.4.1...v0.4.2) (2026-05-06)
+
+
+### Added
+
+* add igem-assistant recipe ([#17](https://github.com/cultivarium/hermes-starter-kit/issues/17)) ([d2e9a80](https://github.com/cultivarium/hermes-starter-kit/commit/d2e9a80c93ac415069cda49f653c143eedf5651f))
+* add igem-projects skill ([#14](https://github.com/cultivarium/hermes-starter-kit/issues/14)) ([af1f215](https://github.com/cultivarium/hermes-starter-kit/commit/af1f215dc9a9cdfe2ad6fc8d8f468be3109dc216))
+
+
+### Fixed
+
+* document MCP OAuth pitfalls in connector recipes ([#16](https://github.com/cultivarium/hermes-starter-kit/issues/16)) ([054adc7](https://github.com/cultivarium/hermes-starter-kit/commit/054adc78778d247469a697826e9b9f04ccdebb06))
+
 ## [0.4.1](https://github.com/cultivarium/hermes-starter-kit/compare/v0.4.0...v0.4.1) (2026-05-05)
 
 
