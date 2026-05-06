@@ -71,6 +71,7 @@ under the MIT license. Full attribution and license texts are in
 | [`add-an-mcp-server`](recipes/add-an-mcp-server.yaml) | Interactive walkthrough for connecting any MCP-speaking data source. |
 | [`set-up-notion`](recipes/set-up-notion.yaml) | Guided setup for the kit's Notion connector — writes the right config block and walks you through Goose Desktop's Extensions UI. |
 | [`update-kit`](recipes/update-kit.yaml) | Pulls the latest skills and recipes from the public starter kit repo. Files you've edited locally are preserved. |
+| [`igem-assistant`](recipes/igem-assistant.yaml) | Domain assistant for iGEM teams. Routes across the three iGEM skills (`igem-competition-helper`, `igem-past-winners`, `igem-projects`) for competition logistics, historical results, and prior-art search. |
 
 ## First run
 

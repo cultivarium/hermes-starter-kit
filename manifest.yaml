@@ -80,6 +80,9 @@ recipes:
   - name: update-kit
     path: recipes/update-kit.yaml
     sha256: ba77904feb1902e16036bbd779dac044d7d14e64a95c164cdae0fdd0bcf7e26d
+  - name: igem-assistant
+    path: recipes/igem-assistant.yaml
+    sha256: TBD-AT-RELEASE
 
 # Names shown in the "what to try first" line of the post-install summary.
 starter_recipes_to_advertise:
