@@ -59,16 +59,23 @@ prompt: |
            type: stdio
            cmd: "npx"                      # or python, uvx, /usr/local/bin/foo, ...
            args: ["-y", "<package-name>"]  # any other args the server needs
-           env_keys: ["FOO_TOKEN"]         # references to keyring entries
+           env_keys: ["FOO_TOKEN"]         # names of env vars Goose resolves from
+                                           # the OS keyring (populated via `goose
+                                           # configure`). Preferred path for secrets.
+           envs: {}                        # literal env-var values passed straight
+                                           # to the subprocess. Use only when keyring
+                                           # isn't working — values land in plaintext
+                                           # in config.yaml.
 
      Pick a sensible top-level name — usually the service name
      (postgres, sentry, etc.) — and confirm it doesn't collide with an
      existing entry.
 
   5. **Store secrets in the OS keyring** with `goose configure`.
-     Never put API keys or tokens directly into config.yaml. Walk
-     the user through running `goose configure`, picking the new
-     extension, and pasting the value when prompted.
+     This is the preferred path: tokens stay out of config.yaml.
+     Walk the user through running `goose configure`, picking the new
+     extension, and pasting the value when prompted. After they finish,
+     restart Goose and run the verify step.
 
   6. **Verify the server loads.** In a fresh Goose session, ask the
      user to run a prompt that exercises the server (you can suggest
@@ -78,9 +85,21 @@ prompt: |
        - the package name is wrong or unpublished — check `npm view
          <pkg>`
        - the binary isn't on PATH — use an absolute `cmd:`
-       - missing env var — re-run `goose configure`
+       - server reports the env var is missing even after `goose
+         configure` — the keyring lookup is silently failing. Re-run
+         `goose configure` first; if that doesn't take, fall back to
+         inlining the value via `envs:` (see the next bullet).
        - server crashes on startup — run `npx -y <pkg>` in a terminal
          to see its stderr
+
+     **Keyring-fallback fix.** If `env_keys` lookup keeps failing,
+     replace `env_keys: ["FOO_TOKEN"]` with `envs: { FOO_TOKEN: "<value>" }`
+     in the stanza. This bypasses the keyring entirely. Tell the user
+     plainly: their token is now stored in plaintext in config.yaml,
+     so they should treat that file like a secret — chmod 600 it,
+     don't commit it, and rotate the token if the file leaks. This
+     isn't the recommended path, but it's a tested unblock when
+     keyring resolution is broken on the user's machine.
 
   7. **Wrap up.** Tell the user where their new extension lives in
      config.yaml, how to disable it (`enabled: false` or remove the
@@ -90,8 +109,11 @@ prompt: |
 
   Important constraints:
 
-  - Never write a secret to config.yaml or any other file. Always
-    route credentials through `goose configure`.
+  - **Prefer keyring (`env_keys` + `goose configure`) for secrets.**
+    Only fall back to inline `envs:` values when the keyring path is
+    demonstrably failing — and when you do, tell the user clearly that
+    their token is now plaintext in config.yaml so they can manage
+    that risk themselves.
   - If the user asks about an MCP server you don't recognize, don't
     invent its config — read the package's README first (web fetch
     is fine) and quote what you find.

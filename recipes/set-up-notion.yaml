@@ -112,7 +112,7 @@ prompt: |
   which pages/databases to share with the integration, and approves.
   Goose stashes the refresh token in the OS keyring transparently.
 
-  **Two known Goose Desktop quirks to warn the user about up front so
+  **Three known Goose Desktop quirks to warn the user about up front so
   they aren't blindsided** (these are not failures; do not start
   troubleshooting if they happen):
 
@@ -129,6 +129,24 @@ prompt: |
        refresh token is already in the keyring, and the next chat
        picks it up cleanly. Tell the user this in advance so they
        don't sit waiting on a stuck spinner.
+
+    3. **OAuth may re-fire after a Goose restart (or after a long
+       idle).** Notion's hosted MCP issues short-lived access tokens
+       (~1 hour, OAuth 2.1 default) with longer-lived refresh tokens
+       (30–90 days). Many MCP clients today — Goose included — don't
+       reliably use the stored refresh token to silently renew, so a
+       fresh Goose launch or an idle session that crosses the access-
+       token TTL can pop the OAuth browser tabs again instead of
+       reusing the existing credentials. The good news: Notion
+       remembers the integration, so re-granting consent is a
+       one-click confirm rather than a fresh authorization flow.
+       There's no clean recipe-level workaround — this is upstream
+       client-side OAuth behavior across the MCP ecosystem (the same
+       symptom is tracked against Notion's own server in
+       [makenotion/notion-mcp-server#225](https://github.com/makenotion/notion-mcp-server/issues/225)
+       and against multiple other MCP clients). Tell the user to
+       expect occasional re-prompts and that subsequent chats within
+       the same Goose session reuse the token cleanly.
 
   ## Step 7 — Confirm success
 
