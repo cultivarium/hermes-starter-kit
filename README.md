@@ -55,6 +55,7 @@ fast instead of prompting.
 | [`genomespot-predictions`](skills/genomespot-predictions/) | Look up [GenomeSPOT](https://github.com/cultivarium/GenomeSPOT)-predicted growth conditions (temperature, pH, salinity, oxygen tolerance) for ~16k bacterial and archaeal genomes by NCBI assembly accession. |
 | [`igem-competition-helper`](skills/igem-competition-helper/) | Help iGEM participants prepare for the competition — registration, deliverables, medal criteria, human practices, parts/chassis — grounded in 87 documents scraped from the official iGEM sites. |
 | [`igem-past-winners`](skills/igem-past-winners/) | Look up retrospective iGEM results from 2015–2025: grand prizes, gold/silver/bronze medals, special prizes, village awards, and a 3,747-team metadata index for direct team lookup. |
+| [`igem-projects`](skills/igem-projects/) | Search the full iGEM project registry (2004–2025, ~4,900 projects across ~2,000 teams) by keyword, organism, village, medal, or team — with synonym broadening and cross-rename village families for thematic trend queries. |
 
 The `pysam`, `gget`, and `database-lookup` skills are vendored from
 [K-Dense's `claude-scientific-skills`](https://github.com/K-Dense-AI/claude-scientific-skills)
