@@ -18,7 +18,7 @@ schema_version: 1
 kit_version: 0.4.3
 # x-release-please-end
 min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
-released: "2026-05-06"
+released: "2026-05-07"
 
 # Skills are vendored under skills/<name>/ in this repo. The installer copies
 # each into ~/.config/goose/skills/<name>/ unless the user has modified the
@@ -73,7 +73,7 @@ recipes:
     sha256: 23eca95faf0519841fa57d8a92220d87620c96b60f8317fd853ca0696ab1acdf
   - name: add-an-mcp-server
     path: recipes/add-an-mcp-server.yaml
-    sha256: 77ede021ec952df24e52b79bc4db822dff697110f44c9802fe9367363e8db88a
+    sha256: 856e16eecbf4132cc69ab46b641846802f620d9f3acd57339a8d1d5f191b9aaa
   - name: set-up-notion
     path: recipes/set-up-notion.yaml
     sha256: 8f199b83ebba1aa4dfb39a083c753155f14362cbf02799afb2e4f9a5a20b758c
