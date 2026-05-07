@@ -4,6 +4,13 @@ All notable changes to the Hermes Starter Kit are tracked here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [0.4.3](https://github.com/cultivarium/hermes-starter-kit/compare/v0.4.2...v0.4.3) (2026-05-07)
+
+
+### Added
+
+* rework add-an-mcp-server recipe for Desktop users ([#18](https://github.com/cultivarium/hermes-starter-kit/issues/18)) ([a2de45e](https://github.com/cultivarium/hermes-starter-kit/commit/a2de45e52f5f2376c9d1da425c6b0ac4f32b8b45))
+
 ## [0.4.2](https://github.com/cultivarium/hermes-starter-kit/compare/v0.4.1...v0.4.2) (2026-05-06)
 
 
