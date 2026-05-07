@@ -2,10 +2,9 @@ version: "1.0.0"
 title: "Connect a new MCP server"
 description: >
   An interactive walkthrough that helps the user add an MCP (Model
-  Context Protocol) server to their Goose install. The agent helps
-  them find a server, configure it in config.yaml, store any
-  credentials in the OS keyring via `goose configure`, and verify it
-  loads.
+  Context Protocol) server to their Goose install. Supports both
+  Goose Desktop (primary) and Goose CLI. The agent helps them find a
+  server, configure it, supply any credentials, and verify it loads.
 
 prompt: |
   Help the user connect a new MCP server to Goose. Walk through the
@@ -13,7 +12,7 @@ prompt: |
   is to understand the moving parts, not just paste a stanza.
 
   An MCP server is a process that exposes tools/resources over the
-  Model Context Protocol. Goose calls it as an "extension" in
+  Model Context Protocol. Goose calls it an "extension" in
   config.yaml. There are three transport types:
 
     - **stdio**: Goose spawns a local subprocess. Most common; what
@@ -23,14 +22,20 @@ prompt: |
     - **builtin**: Bundled inside Goose itself (developer, memory,
       computercontroller).
 
-  Walk the user through these steps, confirming at each one:
+  Walk the user through these steps, confirming at each one.
 
-  1. **Decide what the server should do.** Ask the user what data or
+  1. **Identify the environment.** Ask whether the user is running
+     Goose Desktop (the .app / Windows app) or Goose CLI in a
+     terminal. Most users are on Desktop; default to that path
+     unless they say otherwise. The two flows diverge at step 5
+     (adding the extension) and step 7 (restart).
+
+  2. **Decide what the server should do.** Ask the user what data or
      tool they want to give the agent access to. Examples: read a
      specific Postgres database, search internal Notion pages, run
      blast queries against a local sequence database, etc.
 
-  2. **Find a server.** For common cases, point them at:
+  3. **Find a server.** For common cases, point them at:
 
        - <https://github.com/modelcontextprotocol/servers> for the
          official catalog (`@modelcontextprotocol/server-*`).
@@ -39,91 +44,197 @@ prompt: |
        - <https://goose-docs.ai/docs/mcp/> for Goose-tested servers.
 
      If the user already has a specific package in mind, skip ahead.
+     Record the package name, the package manager (npm, pip, uvx,
+     etc.), and the launch command (e.g. `npx -y <package>`).
 
-  3. **Check the auth model.** Read the server's README and tell the
-     user, in plain language: does it need an API key, an OAuth flow,
-     a token, or nothing at all? What env vars does it expect? Stop
-     and confirm the user has the credentials before moving on.
+  4. **Check the auth model and gather credentials.** Read the
+     server's README and tell the user, in plain language: does it
+     need an API key, an OAuth flow, a token, or nothing at all?
+     What env vars does it expect? Stop and confirm the user has the
+     credentials in hand before moving on.
 
-  4. **Add the extension stanza** to Goose's config.yaml under
-     `extensions:`. The file lives at:
+  5. **Add the extension.** Two paths depending on environment:
+
+     **Desktop (primary path).** Use the built-in Extensions UI:
+
+       1. Click the **☰** menu (top-left) → **Extensions**.
+       2. Click **Add custom extension**.
+       3. Fill in the modal:
+
+            - **Type**: `Standard IO`
+            - **ID**: short name, e.g. `linear`
+            - **Name**: display name, e.g. `Linear`
+            - **Description**: one line about what it does
+            - **Command**: the full launch command, e.g.
+              `npx -y mcp-server-linear`
+            - **Timeout**: `300`
+
+       4. If the server needs credentials, click **Add** next to
+          Environment Variables and enter the variable name (e.g.
+          `LINEAR_ACCESS_TOKEN`) and its value (the actual token).
+       5. Click **Add** at the bottom of the modal to save.
+
+     The Desktop UI writes the extension into config.yaml for you.
+     It may store env vars under `env_keys:` (keyring) by default —
+     step 6 covers verifying and switching that to inline.
+
+     **CLI / manual (alternate path).** Use the developer
+     extension's file tools to edit config.yaml directly. The file
+     lives at:
 
        - macOS / Linux: `~/.config/goose/config.yaml`
        - Windows: `%APPDATA%\Block\goose\config\config.yaml`
          (typically `C:\Users\<you>\AppData\Roaming\Block\goose\config\config.yaml`)
 
-     Use the developer extension's file tools to make the edit. The
-     shape:
+     Add a stanza under `extensions:`:
 
          <name>:
            type: stdio
+           enabled: true
            cmd: "npx"                      # or python, uvx, /usr/local/bin/foo, ...
            args: ["-y", "<package-name>"]  # any other args the server needs
-           env_keys: ["FOO_TOKEN"]         # names of env vars Goose resolves from
-                                           # the OS keyring (populated via `goose
-                                           # configure`). Preferred path for secrets.
-           envs: {}                        # literal env-var values passed straight
-                                           # to the subprocess. Use only when keyring
-                                           # isn't working — values land in plaintext
-                                           # in config.yaml.
+           envs:                           # literal env-var values passed to the
+             FOO_TOKEN: "<value>"          # subprocess. Stored in plaintext in
+                                           # config.yaml — see step 6 on locking
+                                           # the file down.
+           env_keys: []                    # keyring lookup. Leave empty unless
+                                           # the user specifically wants keyring;
+                                           # see step 6.
+           timeout: 300
 
      Pick a sensible top-level name — usually the service name
-     (postgres, sentry, etc.) — and confirm it doesn't collide with an
-     existing entry.
+     (postgres, linear, etc.) — and confirm it doesn't collide with
+     an existing entry.
 
-  5. **Store secrets in the OS keyring** with `goose configure`.
-     This is the preferred path: tokens stay out of config.yaml.
-     Walk the user through running `goose configure`, picking the new
-     extension, and pasting the value when prompted. After they finish,
-     restart Goose and run the verify step.
+  6. **Make sure secrets land in `envs:`, not `env_keys:`.** The
+     default secret-storage path for this recipe is inline `envs:`
+     in config.yaml. Goose's keyring path (`env_keys:`) fails
+     silently often enough — especially on Desktop — that starting
+     there costs more time than it saves.
 
-  6. **Verify the server loads.** In a fresh Goose session, ask the
-     user to run a prompt that exercises the server (you can suggest
-     one based on what the server does). If the server fails, common
-     fixes:
+     Trade-off: inline `envs:` puts the token in plaintext at
+     `~/.config/goose/config.yaml`. Treat that file like a password.
+     Tell the user to lock it down:
 
-       - the package name is wrong or unpublished — check `npm view
-         <pkg>`
-       - the binary isn't on PATH — use an absolute `cmd:`
-       - server reports the env var is missing even after `goose
-         configure` — the keyring lookup is silently failing. Re-run
-         `goose configure` first; if that doesn't take, fall back to
-         inlining the value via `envs:` (see the next bullet).
-       - server crashes on startup — run `npx -y <pkg>` in a terminal
-         to see its stderr
+         chmod 600 ~/.config/goose/config.yaml
 
-     **Keyring-fallback fix.** If `env_keys` lookup keeps failing,
-     replace `env_keys: ["FOO_TOKEN"]` with `envs: { FOO_TOKEN: "<value>" }`
-     in the stanza. This bypasses the keyring entirely. Tell the user
-     plainly: their token is now stored in plaintext in config.yaml,
-     so they should treat that file like a secret — chmod 600 it,
-     don't commit it, and rotate the token if the file leaks. This
-     isn't the recommended path, but it's a tested unblock when
-     keyring resolution is broken on the user's machine.
+     Don't commit it, and rotate the token if the file ever leaks.
 
-  7. **Wrap up.** Tell the user where their new extension lives in
-     config.yaml, how to disable it (`enabled: false` or remove the
-     stanza), and confirm that the starter-kit installer will not
-     touch user-added extensions on `update.sh` (only extensions
-     listed in manifest.yaml's `owned_keys` are managed).
+     **If the user added the extension via the Desktop UI**, verify
+     what actually got written:
+
+         grep -A 12 "<extension-name>:" ~/.config/goose/config.yaml
+
+     If you see `env_keys: [TOKEN_NAME]` and `envs: {}`, the UI used
+     keyring. Edit the stanza to flip it:
+
+         envs:
+           TOKEN_NAME: "<actual-token>"
+         env_keys: []
+
+     **If the user explicitly wants keyring** (a reasonable case for
+     CLI users with a working keychain), use `goose configure`
+     instead: pick the new extension and paste the value when
+     prompted. Keep `env_keys: ["TOKEN_NAME"]` in the stanza and
+     leave `envs: {}`. If verification later fails with a missing-
+     env error, fall back to inline as above.
+
+  7. **Restart Goose fully.** Config changes only take effect after
+     a complete restart. Starting a new chat or session in an
+     already-running app does **not** reload config.
+
+     **Desktop:** quit the app entirely (Cmd+Q on macOS, File → Quit
+     on Windows/Linux). Closing the window isn't enough. Confirm
+     it's gone:
+
+         ps aux | grep -i goose | grep -v grep
+
+     Should print nothing. Then relaunch from Applications / Start
+     menu.
+
+     **CLI:** exit the current session (`exit` or Ctrl-D), then
+     start a new one (`goose session start`).
+
+  8. **Verify the server loads.** After restart, run these checks
+     in order until you hit a green light:
+
+     a. **Process running?**
+
+            ps aux | grep -i "<package-name>" | grep -v grep
+
+        Goose should have spawned the MCP server subprocess.
+
+     b. **Config sane?**
+
+            grep -A 15 "<extension-name>:" ~/.config/goose/config.yaml
+
+        Confirm `enabled: true`, the cmd/args are right, and the
+        token is in `envs:` (or `env_keys:` if the user chose
+        keyring).
+
+     c. **Server runs standalone?**
+
+            echo '{"jsonrpc":"2.0","method":"tools/list","id":1}' | npx -y <package-name>
+
+        Should return JSON listing the server's tools. If this
+        crashes, the problem is in the server itself, not Goose.
+
+     d. **Tools reachable from Goose?** Ask the user to run a
+        prompt that exercises the server (suggest one based on
+        what the server does — e.g. "list my Linear teams" for
+        Linear).
+
+  9. **Troubleshoot if needed.** Common failure modes:
+
+       - **Tools don't appear after restart.** Most often the app
+         wasn't fully quit. Re-run the `ps aux` check from step 7,
+         force-quit anything still running, relaunch.
+       - **Server starts but auth fails silently.** Token is in
+         `env_keys:` and the keyring lookup is failing. Switch to
+         inline `envs:` per step 6.
+       - **Server crashes on startup.** Run `npx -y <pkg>` directly
+         in a terminal to read its stderr. Often a wrong package
+         name (`npm view <pkg>` to confirm) or a binary that isn't
+         on PATH (use an absolute `cmd:`).
+       - **Desktop UI added the extension but it's missing from
+         config.yaml.** Toggle the extension off and on in the
+         Extensions UI, restart, and check again. If still missing,
+         remove via UI and add manually per step 5's CLI path.
+       - **Desktop logs.** For Desktop-specific issues, recent log
+         entries live at
+         `~/Library/Application Support/Goose/logs/main.log`
+         (macOS; Windows is under `%APPDATA%\Block\goose\logs`).
+
+  10. **Wrap up.** Tell the user:
+
+        - where their extension lives in config.yaml,
+        - how to disable it (toggle off in the Extensions UI on
+          Desktop, or set `enabled: false` in config.yaml),
+        - and that the starter-kit installer will not touch
+          user-added extensions on `update.sh` — only extensions
+          listed in manifest.yaml's `owned_keys` are managed.
+
+      If the secret is stored inline, remind them once more:
+      `chmod 600` the config file, don't commit it, rotate the
+      token if it leaks.
 
   Important constraints:
 
-  - **Prefer keyring (`env_keys` + `goose configure`) for secrets.**
-    Only fall back to inline `envs:` values when the keyring path is
-    demonstrably failing — and when you do, tell the user clearly that
-    their token is now plaintext in config.yaml so they can manage
-    that risk themselves.
+  - **Default secrets to inline `envs:`** for both Desktop and CLI
+    users. Goose's keyring path is unreliable enough that starting
+    there wastes time. Use keyring only when the user specifically
+    asks for it, and be ready to fall back to inline if it fails.
+  - Tell the user plainly that inline `envs:` means plaintext in
+    config.yaml, so they understand the trade-off.
   - If the user asks about an MCP server you don't recognize, don't
     invent its config — read the package's README first (web fetch
     is fine) and quote what you find.
   - If the user wants to add one of the connectors the starter kit
-    already manages (gdrive, slack, notion), tell them to
-    re-run the installer and pick it there — that path is
-    update-safe.
+    already manages (gdrive, slack, notion), tell them to re-run
+    the installer and pick it there — that path is update-safe.
 
 activities:
   - "Find an MCP server for the task"
-  - "Add the extension stanza to config.yaml"
-  - "Store credentials via `goose configure`"
-  - "Verify it loads"
+  - "Add the extension via Desktop UI or config.yaml"
+  - "Restart Goose and verify it loads"
+  - "Troubleshoot if the server doesn't appear"
