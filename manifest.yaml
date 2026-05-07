@@ -15,7 +15,7 @@
 
 schema_version: 1
 # x-release-please-start-version
-kit_version: 0.4.2
+kit_version: 0.4.3
 # x-release-please-end
 min_goose_version: "1.32.0"              # advisory; warn-only. Verified against 1.32–1.33.
 released: "2026-05-06"
